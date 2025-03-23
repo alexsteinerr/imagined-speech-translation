@@ -41,7 +41,7 @@
       "special": true
     },
     "21128": {
-      "content": "[EOS]",
+      "content": "[EOS_TOKEN]",
       "lstrip": false,
       "normalized": false,
       "rstrip": false,
@@ -49,7 +49,7 @@
       "special": true
     },
     "21129": {
-      "content": "[BOS]",
+      "content": "[BOS_TOKEN]",
       "lstrip": false,
       "normalized": false,
       "rstrip": false,
@@ -57,12 +57,12 @@
       "special": true
     }
   },
-  "bos_token": "[BOS]",
+  "bos_token": "[BOS_TOKEN]",
   "clean_up_tokenization_spaces": true,
   "cls_token": "[CLS]",
   "do_basic_tokenize": true,
   "do_lower_case": false,
-  "eos_token": "[EOS]",
+  "eos_token": "[EOS_TOKEN]",
   "extra_special_tokens": {},
   "mask_token": "[MASK]",
   "model_max_length": 1024,

@@ -50,7 +50,7 @@
     },
     {
       "id": 21128,
-      "content": "[EOS]",
+      "content": "[EOS_TOKEN]",
       "single_word": false,
       "lstrip": false,
       "rstrip": false,
@@ -59,7 +59,7 @@
     },
     {
       "id": 21129,
-      "content": "[BOS]",
+      "content": "[BOS_TOKEN]",
       "single_word": false,
       "lstrip": false,
       "rstrip": false,

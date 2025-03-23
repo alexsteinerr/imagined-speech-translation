@@ -1,6 +1,6 @@
 {
   "bos_token": {
-    "content": "[BOS]",
+    "content": "[BOS_TOKEN]",
     "lstrip": false,
     "normalized": false,
     "rstrip": false,
@@ -8,7 +8,7 @@
   },
   "cls_token": "[CLS]",
   "eos_token": {
-    "content": "[EOS]",
+    "content": "[EOS_TOKEN]",
     "lstrip": false,
     "normalized": false,
     "rstrip": false,
