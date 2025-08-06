@@ -11,23 +11,31 @@ def get_electrode_regions():
     """
     return {
         'frontal': [
-            'Fp1', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 
-            'FC5', 'FC1', 'FC2', 'FC6', 'AF3', 'AF4', 'F1', 'F2', 'F5', 'F6'
+            'AF3', 'AF4', 'AF7', 'AFF5h', 'AFF6h', 'AFz',
+            'F1', 'F2', 'F3', 'F4', 'F5', 'F7', 'Fz',
+            'FC1', 'FC2', 'FC3', 'FC4', 'FC5', 'FC6', 'FCz',
+            'FCC3h', 'FCC4h', 'FCC5h', 'FCC6h', 'FCCz',
+            'FFC3h', 'FFC4h', 'FFC5h', 'FFC6h',
+            'Fp1', 'Fp2', 'Fpz'
         ],
         'temporal': [
-            'T7', 'T8', 'TP9', 'TP10', 'FT9', 'FT10', 
-            'T9', 'T10', 'FT7', 'FT8', 'TP7', 'TP8'
+            'FFT7h', 'FFT8h', 'FTT7h', 'FTT8h',
+            'Ft7', 'T7', 'T8',
+            'TP7', 'TP8',
+            'TPP5h', 'TTP7h', 'TTP8h'
         ],
         'central': [
-            'C3', 'Cz', 'C4', 'CP5', 'CP1', 'CP2', 'CP6', 
-            'FC3', 'FC4', 'C1', 'C2', 'C5', 'C6'
+            'C1', 'C2', 'C3', 'C4', 'Cz',
+            'CCP1h', 'CCP2h', 'CCP3h', 'CCP4h'
         ],
         'parietal': [
-            'P7', 'P3', 'Pz', 'P4', 'P8', 'CP3', 'CP4', 
-            'PO9', 'O1', 'Oz', 'O2', 'PO10', 'PO7', 'PO3', 'POz', 'PO4', 'PO8',
-            'P1', 'P2', 'P5', 'P6', 'PO1', 'PO2'
+            'P3', 'P4', 'P5', 'P6', 'P7', 'P8',
+            'CP3', 'CP4',
+            'CPP5h', 'CPP6h',
+            'POz'
         ]
     }
+
 
 # Legacy electrode mappings (keep for backward compatibility)
 frontal_electrodes = get_electrode_regions()['frontal']
