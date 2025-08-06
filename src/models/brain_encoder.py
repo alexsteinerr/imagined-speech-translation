@@ -84,17 +84,14 @@ class BrainRegionEncoder(nn.Module):
     def get_region_weights(self):
         """Get current region importance weights."""
         if hasattr(self, 'region_importance') and not self.uniform_region_weight:
-            raw_weights = self.region_importance.data.cpu().numpy()
             softmax_weights = torch.softmax(self.region_importance, dim=0).data.cpu().numpy()
             return {
                 'names': self.region_names,
-                'raw': raw_weights,
                 'softmax': softmax_weights
             }
         else:
             uniform_weights = [1.0 / self.n_regions] * self.n_regions
             return {
                 'names': self.region_names,
-                'raw': uniform_weights,
                 'softmax': uniform_weights
             }

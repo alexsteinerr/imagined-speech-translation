@@ -242,6 +242,64 @@ class EEGTrainer:
             "epoch": epoch
         })
 
+    def log_region_weights_to_wandb(self, prefix="", step=None):
+        """Log brain region weights to wandb using model.brain_encoder.get_region_weights()."""
+        if not hasattr(self.model, 'brain_encoder'):
+            return
+        
+        try:
+            # Get region weights from the model
+            weights_info = self.model.brain_encoder.get_region_weights()
+            log_dict = {}
+            
+            # Log individual region weights
+            for name, weight in zip(weights_info['names'], weights_info['softmax']):
+                log_dict[f"{prefix}region_weights/{name}"] = float(weight)
+            
+            # Log raw importance parameters if available
+            if hasattr(self.model.brain_encoder, 'region_importance') and not self.model.brain_encoder.uniform_region_weight:
+                raw_weights = self.model.brain_encoder.region_importance.data.cpu().numpy()
+                for name, raw_weight in zip(weights_info['names'], raw_weights):
+                    log_dict[f"{prefix}region_importance_raw/{name}"] = float(raw_weight)
+            
+            # Add step if provided
+            if step is not None:
+                log_dict["step"] = step
+            
+            wandb.log(log_dict)
+            
+        except Exception as e:
+            logger.warning(f"Failed to log region weights: {e}")
+
+    def log_region_weights_table_to_wandb(self, prefix="", step=None):
+        """Log region weights as a table to wandb for better visualization."""
+        if not hasattr(self.model, 'brain_encoder'):
+            return
+        
+        try:
+            # Get region weights from the model
+            weights_info = self.model.brain_encoder.get_region_weights()
+            
+            # Prepare data for the table
+            table_data = []
+            for name, weight in zip(weights_info['names'], weights_info['softmax']):
+                table_data.append([name, float(weight)])
+            
+            # Create wandb table
+            table = wandb.Table(
+                columns=["Region", "Weight"],
+                data=table_data
+            )
+            
+            log_dict = {f"{prefix}region_weights_table": table}
+            if step is not None:
+                log_dict["step"] = step
+            
+            wandb.log(log_dict)
+            
+        except Exception as e:
+            logger.warning(f"Failed to log region weights table: {e}")
+
     def save_checkpoint(self, epoch, metrics, save_path):
         """Save model checkpoint."""
         checkpoint = {
@@ -269,6 +327,9 @@ class EEGTrainer:
                 "epoch": epoch
             })
             
+            # Log region weights during training
+            self.log_region_weights_to_wandb(prefix="train/", step=self.global_step)
+            
             # Evaluation
             if (epoch + 1) % self.config['eval_interval'] == 0:
                 val_metrics = self.evaluate()
@@ -288,7 +349,15 @@ class EEGTrainer:
                     "epoch": epoch
                 })
                 
-                # Log sample predictions and targets to wandb
+
+                self.log_region_weights_to_wandb(prefix="val/", step=self.global_step)
+            
+                if epoch % 5 == 0:  
+                    self.log_region_weights_table_to_wandb(
+                        prefix=f"val/epoch_{epoch}_", step=self.global_step
+                    )
+                
+
                 if predictions and targets:
                     self.log_predictions_to_wandb(predictions, targets, epoch)
                 
