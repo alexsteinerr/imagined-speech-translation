@@ -1,4 +1,4 @@
-# EEG-to-Text Neural Decoding
+# Inner Speech Translation
 
 A deep learning model for decoding Chinese text from EEG brain signals using multi-region neural encoding and BART-based text generation.
 
@@ -27,7 +27,7 @@ EEG Signals (4 regions) → Regional CNNs → Cross-region Attention → EEG-BAR
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/eeg-to-text.git
+git clone https://github.com/alexsteinerr/imagined-speech-translation
 cd eeg-to-text
 
 # Install dependencies
@@ -134,7 +134,7 @@ print(f"Decoded text: {text}")
 ## Repository Structure
 
 ```
-eeg-to-text/
+inner-speech-translation/
 ├── src/
 │   ├── models/          # Neural network architectures
 │   ├── data/            # Dataset and preprocessing
@@ -168,8 +168,8 @@ The model achieves competitive performance on EEG-to-Chinese text tasks:
 ```bibtex
 @misc{eeg-to-text-2024,
   title={EEG-to-Text Neural Decoding for Chinese},
-  author={Your Name},
-  year={2024},
+  author={Alex Steiner},
+  year={2025},
   url={https://github.com/your-username/eeg-to-text}
 }
 ```
@@ -181,4 +181,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - Chinese BART model from [fnlp/bart-base-chinese](https://huggingface.co/fnlp/bart-base-chinese)
-- Inspired by recent work in neural decoding and brain-computer interfaces
+- Inspired by recent work in neural decoding

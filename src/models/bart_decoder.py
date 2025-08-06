@@ -27,11 +27,11 @@ class BARTDecoder(nn.Module):
         
         # EEG to BART feature projection
         self.eeg_to_bart = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim),
-            nn.LayerNorm(hidden_dim),
+            nn.Linear(hidden_dim, hidden_dim*2),
+            nn.LayerNorm(hidden_dim*2),
             nn.GELU(),
-            nn.Dropout(0.1),
-            nn.Linear(hidden_dim, self.bart_dim),
+            nn.Dropout(0.05),
+            nn.Linear(hidden_dim*2, self.bart_dim),
             nn.LayerNorm(self.bart_dim)
         )
         
@@ -43,8 +43,8 @@ class BARTDecoder(nn.Module):
                     nn.init.zeros_(layer.bias)
         
         # Encoder sequence parameters
-        self.encoder_length = 8
-        self.eeg_conditioning_strength = nn.Parameter(torch.tensor(0.2))
+        self.encoder_length = 24
+        self.eeg_conditioning_strength = nn.Parameter(torch.tensor(0.75))
         self.encoder_queries = nn.Parameter(torch.randn(1, self.encoder_length, self.bart_dim) * 0.01)
         
         # Cross-attention for EEG conditioning
@@ -71,7 +71,11 @@ class BARTDecoder(nn.Module):
         batch_size = eeg_feat.shape[0]
         
         # Apply conditioning strength with clamping
-        conditioning_strength = torch.clamp(self.eeg_conditioning_strength, 0.05, 1.0)
+        conditioning_strength = torch.clamp(
+            self.eeg_conditioning_strength, 
+            0.3, 
+            1.2  
+        )
         proj_eeg = self.eeg_to_bart(eeg_feat) * conditioning_strength
         eeg_expanded = proj_eeg.unsqueeze(1)
         

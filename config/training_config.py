@@ -8,13 +8,13 @@ CONFIG = {
     'montage_file': 'data/montage.csv',
     'save_dir': './checkpoints/',
     
-    # Model configuration
+    # Model configuration 
     'pretrained_model': 'fnlp/bart-base-chinese',
     'hidden_dim': 768,
     'n_timepoints': 1651,
-    'max_length': 16,
+    'max_length': 16, 
     
-    # Model architecture options
+    # Model architecture options - 
     'disable_cross_region_attn': False,
     'uniform_region_weight': False,
     'cnn_only': False,
@@ -22,30 +22,30 @@ CONFIG = {
     
     # Training parameters
     'epochs': 100,
-    'batch_size': 4,
-    'accumulation_steps': 8,
+    'batch_size': 4,  
+    'accumulation_steps': 8, 
     'patience': 20,
-    'grad_clip_norm': 5.0,
+    'grad_clip_norm': 1.0, 
     
-    # Learning rates
-    'brain_encoder_lr': 1e-4,
-    'bart_decoder_lr': 1e-5,
-    'bart_encoder_lr': 5e-6,
-    'projection_lr': 5e-4,
+    # Learning rates 
+    'brain_encoder_lr': 5e-4,   
+    'bart_decoder_lr': 5e-5,     
+    'bart_encoder_lr': 1e-5,  
+    'projection_lr': 1e-3,    
     'warmup_steps': 1000,
     'weight_decay': 0.01,
-    'label_smoothing': 0.05,
-    
+    'label_smoothing': 0.01,  
+
     # Generation parameters
-    'num_beams': 4,
-    'max_gen_length': 20,
+    'num_beams': 3,             
+    'max_gen_length': 18,      
     'no_repeat_ngram_size': 2,
-    'length_penalty': 1.0,
-    'min_length': 3,
-    'do_sample': True,
-    'temperature': 0.8,
-    'top_k': 50,
-    'top_p': 0.9,
+    'length_penalty': 0.8,    
+    'min_length': 4,             
+    'do_sample': False,     
+    'temperature': 0.7,   
+    'top_k': 40,           
+    'top_p': 0.85,          
     
     # Data splits
     'train_split': 0.8,
@@ -53,64 +53,59 @@ CONFIG = {
     'val_max_samples': 2000,
     
     # Experiment settings
-    'experiment_name': 'EEG-Chinese',
-    'log_interval': 50,
-    'eval_interval': 2,
-    'save_every_n_epochs': 5,
+    'experiment_name': 'EEG-Chinese-Fixed',  
+    'log_interval': 25,        
+    'eval_interval': 1,       
+    'save_every_n_epochs': 3,    
     
     # Advanced training options
-    'use_amp': False,                    # Automatic mixed precision
-    'find_unused_parameters': True,      # For DDP training
-    'dataloader_num_workers': 0,         # Number of data loading workers
-    'pin_memory': True,                  # Pin memory for faster GPU transfer
-    'persistent_workers': False,         # Keep workers alive between epochs
+    'use_amp': False,
+    'find_unused_parameters': True,
+    'dataloader_num_workers': 0,
+    'pin_memory': True,
+    'persistent_workers': False,
     
     # Regularization
-    'dropout_rate': 0.1,                 # General dropout rate
-    'attention_dropout': 0.1,            # Attention dropout rate
-    'classifier_dropout': 0.1,           # Classifier dropout rate
+    'dropout_rate': 0.08,     
+    'attention_dropout': 0.05,  
+    'classifier_dropout': 0.1,
     
-    # Data augmentation
-    'data_augmentation': True,           # Enable EEG data augmentation
-    'augment_prob': 0.15,               # Probability of applying augmentation
-    'noise_std_ratio': 0.01,            # Noise standard deviation ratio
-    'scale_range': (0.98, 1.02),        # Scaling range for augmentation
+    # Data augmentation 
+    'data_augmentation': True,
+    'augment_prob': 0.1,       
+    'noise_std_ratio': 0.008,   
+    'scale_range': (0.99, 1.01), 
     
     # Validation and testing
-    'val_check_interval': 0.5,          # Validation check interval (fraction of epoch)
-    'test_split': 0.1,                  # Test set split ratio
-    'early_stopping_metric': 'bleu_4',  # Metric for early stopping
-    'early_stopping_mode': 'max',       # 'max' or 'min' for early stopping
+    'val_check_interval': 0.5,
+    'test_split': 0.1,
+    'early_stopping_metric': 'bleu_4',
+    'early_stopping_mode': 'max',
     
     # Logging and monitoring
-    'log_every_n_steps': 10,            # Log training metrics every n steps
-    'save_top_k': 3,                    # Save top k checkpoints
-    'monitor_metric': 'val_bleu_4',     # Metric to monitor for checkpointing
-    'log_predictions': True,            # Log prediction examples
-    'max_prediction_examples': 5,       # Max prediction examples to log
+    'log_every_n_steps': 10,
+    'save_top_k': 3,
+    'monitor_metric': 'val_bleu_4',
+    'log_predictions': True,
+    'max_prediction_examples': 8,  
     
     # Model specific parameters
-    'freeze_bart_encoder': False,       # Freeze BART encoder during training
-    'freeze_bart_embeddings': True,     # Freeze BART embeddings
-    'region_attention_heads': 8,        # Number of attention heads for region fusion
-    'region_fusion_layers': 1,          # Number of transformer layers for region fusion
+    'freeze_bart_encoder': False,
+    'freeze_bart_embeddings': False, 
+    'region_attention_heads': 8,
+    'region_fusion_layers': 1,
     
-    # Generation evaluation parameters
-    'eval_generation_config': {
-        'num_beams': 4,
-        'max_length': 20,
-        'min_length': 3,
-        'length_penalty': 1.0,
-        'no_repeat_ngram_size': 2,
-        'do_sample': False,
-        'early_stopping': True
-    },
-    
+    # EEG-SPECIFIC PARAMETERS
+    'eeg_conditioning_strength_init': 0.7, 
+    'eeg_conditioning_clamp_min': 0.3,  
+    'eeg_conditioning_clamp_max': 1.2,      
+    'encoder_sequence_length': 24,        
+    'eeg_projection_layers': 3,        
     
     # Reproducibility
-    'seed': 42,                        # Random seed
-    'deterministic': True,             # Use deterministic algorithms
-    'benchmark': False,                # Enable cudnn benchmark
+    'seed': 42,
+    'deterministic': True,
+    'benchmark': False,
 }
 
 def get_optimizer_config():

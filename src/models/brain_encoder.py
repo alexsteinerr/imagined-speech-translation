@@ -12,7 +12,7 @@ class BrainRegionEncoder(nn.Module):
     Encodes EEG data from different brain regions and fuses them.
     """
     
-    def __init__(self, n_timepoints, region_channel_counts, hidden_dim=128, 
+    def __init__(self, n_timepoints, region_channel_counts, hidden_dim=768, 
                  disable_cross_region_attn=False, uniform_region_weight=False, cnn_only=False):
         super().__init__()
         self.region_names = ['frontal', 'temporal', 'central', 'parietal']

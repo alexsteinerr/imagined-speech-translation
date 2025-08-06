@@ -146,13 +146,23 @@ class EEGTrainer:
         self.model.eval()
         all_predictions = []
         all_targets = []
+        total_val_loss = 0.0
+        total_val_samples = 0
         
         with torch.no_grad():
             for batch in tqdm(self.val_loader, desc="Evaluating", leave=False):
                 try:
                     eeg = [region.to(self.device) for region in batch['eeg']]
+                    decoder_input_ids = batch['decoder_input_ids'].to(self.device)
                     labels = batch['labels'].to(self.device)
                     
+                    # Calculate validation loss
+                    val_outputs = self.safe_forward_pass(eeg, decoder_input_ids, labels)
+                    if val_outputs is not None and val_outputs.loss is not None:
+                        total_val_loss += val_outputs.loss.item() * len(labels)
+                        total_val_samples += len(labels)
+                    
+                    # Generate predictions
                     gen_config = {
                         'max_length': self.config['max_gen_length'],
                         'num_beams': self.config['num_beams'],
@@ -181,15 +191,56 @@ class EEGTrainer:
                     torch.cuda.empty_cache()
                     continue
         
+        # Calculate average validation loss
+        avg_val_loss = total_val_loss / total_val_samples if total_val_samples > 0 else float('inf')
+        
         if not all_predictions:
-            return {'bleu_1': 0.0, 'bleu_2': 0.0, 'bleu_3': 0.0, 'bleu_4': 0.0, 'rouge_l_f': 0.0}
+            return {
+                'bleu_1': 0.0, 'bleu_2': 0.0, 'bleu_3': 0.0, 'bleu_4': 0.0, 
+                'rouge_l_f': 0.0, 'val_loss': avg_val_loss,
+                'predictions': [], 'targets': []
+            }
         
         try:
             metrics = self.evaluator.compute_all_metrics(all_predictions, all_targets)
+            metrics['val_loss'] = avg_val_loss
+            metrics['predictions'] = all_predictions
+            metrics['targets'] = all_targets
         except:
-            metrics = {'bleu_1': 0.0, 'bleu_2': 0.0, 'bleu_3': 0.0, 'bleu_4': 0.0, 'rouge_l_f': 0.0}
+            metrics = {
+                'bleu_1': 0.0, 'bleu_2': 0.0, 'bleu_3': 0.0, 'bleu_4': 0.0, 
+                'rouge_l_f': 0.0, 'val_loss': avg_val_loss,
+                'predictions': all_predictions, 'targets': all_targets
+            }
         
         return metrics
+
+    def log_predictions_to_wandb(self, predictions, targets, epoch, max_samples=10):
+        """Log sample predictions and targets to wandb as a table."""
+        # Limit the number of samples to avoid overwhelming wandb
+        num_samples = min(len(predictions), max_samples)
+        
+        # Create data for wandb table
+        table_data = []
+        for i in range(num_samples):
+            table_data.append([
+                i + 1,
+                targets[i],
+                predictions[i],
+                len(targets[i].split()),  # target length
+                len(predictions[i].split())  # prediction length
+            ])
+        
+        # Create wandb table
+        table = wandb.Table(
+            columns=["Sample", "Target", "Prediction", "Target_Length", "Pred_Length"],
+            data=table_data
+        )
+        
+        wandb.log({
+            f"predictions_table_epoch_{epoch}": table,
+            "epoch": epoch
+        })
 
     def save_checkpoint(self, epoch, metrics, save_path):
         """Save model checkpoint."""
@@ -222,19 +273,33 @@ class EEGTrainer:
             if (epoch + 1) % self.config['eval_interval'] == 0:
                 val_metrics = self.evaluate()
                 bleu4 = val_metrics['bleu_4']
+                val_loss = val_metrics['val_loss']
+                predictions = val_metrics['predictions']
+                targets = val_metrics['targets']
                 
+                # Log metrics to wandb
                 wandb.log({
+                    "val/loss": val_loss,
                     "val/bleu_1": val_metrics['bleu_1'],
+                    "val/bleu_2": val_metrics['bleu_2'],
+                    "val/bleu_3": val_metrics['bleu_3'],
                     "val/bleu_4": bleu4,
                     "val/rouge_l": val_metrics['rouge_l_f'],
                     "epoch": epoch
                 })
                 
+                # Log sample predictions and targets to wandb
+                if predictions and targets:
+                    self.log_predictions_to_wandb(predictions, targets, epoch)
+                
                 # Save best model
                 if bleu4 > self.best_bleu4:
                     self.best_bleu4 = bleu4
                     save_path = os.path.join(self.config['save_dir'], "best_model.pth")
-                    self.save_checkpoint(epoch, val_metrics, save_path)
+                    # Remove predictions and targets from checkpoint to save space
+                    checkpoint_metrics = {k: v for k, v in val_metrics.items() 
+                                        if k not in ['predictions', 'targets']}
+                    self.save_checkpoint(epoch, checkpoint_metrics, save_path)
                     logger.info(f"New best BLEU-4: {bleu4:.3f}")
                     self.patience_counter = 0
                 else:
