@@ -11,23 +11,22 @@ def get_electrode_regions():
     """
     return {
         'frontal': [
-            'Fp1', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 
-            'FC5', 'FC1', 'FC2', 'FC6', 'AF3', 'AF4', 'F1', 'F2', 'F5', 'F6'
+            'FC5', 'F5', 'F7', 'F3', 'FC1', 'F1', 'AF3', 'Fz',
+            'FC2', 'F2', 'AF4', 'Fp2', 'F4', 'F6', 'F8', 'FC6'
         ],
         'temporal': [
-            'T7', 'T8', 'TP9', 'TP10', 'FT9', 'FT10', 
-            'T9', 'T10', 'FT7', 'FT8', 'TP7', 'TP8'
+            'T9', 'FT9', 'T7', 'TP7', 'FT8', 'T10', 'FT10', 'T8', 'TP8'
         ],
         'central': [
-            'C3', 'Cz', 'C4', 'CP5', 'CP1', 'CP2', 'CP6', 
-            'FC3', 'FC4', 'C1', 'C2', 'C5', 'C6'
+            'C5', 'C3', 'FC3', 'C1', 'CP1', 'Cz',
+            'CP2', 'C2', 'C4', 'FC4', 'C6'
         ],
         'parietal': [
-            'P7', 'P3', 'Pz', 'P4', 'P8', 'CP3', 'CP4', 
-            'PO9', 'O1', 'Oz', 'O2', 'PO10', 'PO7', 'PO3', 'POz', 'PO4', 'PO8',
-            'P1', 'P2', 'P5', 'P6', 'PO1', 'PO2'
+            'P7', 'P5', 'CP3', 'P3', 'PO3', 'PO1',
+            'PO2', 'P4', 'PO4', 'P6', 'CP4', 'P8'
         ]
     }
+
 
 # Legacy electrode mappings (keep for backward compatibility)
 frontal_electrodes = get_electrode_regions()['frontal']
