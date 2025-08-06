@@ -1,232 +1,369 @@
 import os
-import pickle
-import random
+import time
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader, random_split
-from transformers import AutoTokenizer
-from tqdm import tqdm
+import wandb
+import numpy as np
+from tqdm.auto import tqdm
+from torch.utils.data import DataLoader, random_split
+from transformers import AutoTokenizer, get_linear_schedule_with_warmup, AdamW
+from dataset import EEGDataset
+from evaluation import ChineseEvaluator
+from models import EEGDecodingModel
+import logging
 
-MAX_TARGET_LEN = 32
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-class EEGDataset(Dataset):
-    def __init__(self, directory, max_seq_len=2500, tokenizer_name="uer/gpt2-chinese-cluecorpussmall"):
-        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-        if self.tokenizer.eos_token is None:
-            self.tokenizer.add_special_tokens({'eos_token': '[EOS]'})
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-        if self.tokenizer.bos_token is None:
-            self.tokenizer.add_special_tokens({'bos_token': '[BOS]'})
-        self.tokenizer.pad_token = self.tokenizer.eos_token
-        self.max_seq_len = max_seq_len
-        all_files = []
-        for root, _, files in os.walk(directory):
-            for file in files:
-                if file.endswith(".pkl"):
-                    all_files.append(os.path.join(root, file))
-        random.shuffle(all_files)
-        self.samples = []
-        for fp in tqdm(all_files, desc="Loading EEG dataset"):
-            data = self.load_single_eeg_file(fp)
-            if data is None:
-                continue
-            if isinstance(data, list):
-                data = data[0]
-            eeg = torch.tensor(data['input_features'], dtype=torch.float32)
-            eeg = self.pad_or_truncate(eeg)
-            label = data['text']
-            tokenized = self.tokenizer(label, padding='max_length', truncation=True, max_length=MAX_TARGET_LEN - 1, return_tensors='pt')
-            input_ids = tokenized['input_ids'].squeeze(0)
-            bos = self.tokenizer.bos_token_id or self.tokenizer.eos_token_id
-            input_ids = torch.cat([torch.tensor([bos], dtype=torch.long), input_ids], dim=0)
-            if input_ids.size(0) < MAX_TARGET_LEN:
-                pad_len = MAX_TARGET_LEN - input_ids.size(0)
-                pad = torch.full((pad_len,), self.tokenizer.pad_token_id, dtype=torch.long)
-                input_ids = torch.cat([input_ids, pad], dim=0)
-            elif input_ids.size(0) > MAX_TARGET_LEN:
-                input_ids = input_ids[:MAX_TARGET_LEN]
-            self.samples.append({'eeg': eeg, 'target_ids': input_ids, 'groundtruth': label})
-        random.shuffle(self.samples)
-        self.build_label_mapping()
-
-    def load_single_eeg_file(self, fp):
-        try:
-            with open(fp, 'rb') as f:
-                return pickle.load(f)
-        except (EOFError, pickle.UnpicklingError):
-            return None
-
-    def pad_or_truncate(self, eeg):
-        L = eeg.shape[-1]
-        if L < self.max_seq_len:
-            pad = torch.zeros((eeg.shape[0], eeg.shape[1], self.max_seq_len - L))
-            return torch.cat((eeg, pad), dim=-1)
-        elif L > self.max_seq_len:
-            return eeg[..., :self.max_seq_len]
-        return eeg
-
-    def build_label_mapping(self):
-        self.label_to_idx = {}
-        idx = 0
-        for s in self.samples:
-            label = s['groundtruth']
-            if label and label not in self.label_to_idx:
-                self.label_to_idx[label] = idx
-                idx += 1
-
-    def __len__(self):
-        return len(self.samples)
-
-    def __getitem__(self, idx):
-        return self.samples[idx]
-
-def get_train_test_loaders(directory, batch_size=16, test_split=0.2, max_seq_len=2500):
-    dataset = EEGDataset(directory, max_seq_len=max_seq_len)
-    test_size = int(test_split * len(dataset))
-    train_size = len(dataset) - test_size
-    train_ds, test_ds = random_split(dataset, [train_size, test_size])
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
-    return train_loader, test_loader, dataset
-
-class ViTBranch(nn.Module):
-    def __init__(self, in_channels, embed_dim, patch_size, num_layers, num_heads, vocab_size):
-        super(ViTBranch, self).__init__()
-        self.patch_embedding = nn.Conv2d(in_channels, embed_dim, kernel_size=patch_size, stride=patch_size)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=num_heads)
-        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
-        self.fc = nn.Linear(embed_dim, vocab_size)
-        
-    def forward(self, x):
-        x = self.patch_embedding(x)
-        batch_size, embed_dim, _, _ = x.size()
-        x = x.flatten(2).transpose(1, 2)
-        cls_tokens = self.cls_token.expand(batch_size, -1, -1)
-        x = torch.cat((cls_tokens, x), dim=1)
-        x = self.transformer(x.transpose(0, 1)).transpose(0, 1)
-        cls_out = x[:, 0, :]
-        logits = self.fc(cls_out)
-        return F.log_softmax(logits, dim=-1)
-
-class LSTMBranch(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, vocab_size, bidirectional=True):
-        super(LSTMBranch, self).__init__()
-        self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True, bidirectional=bidirectional)
-        self.fc = nn.Linear(hidden_dim * 2 if bidirectional else hidden_dim, vocab_size)
+CONFIG = {
+    'data_dir': 'data/eeg_data/',
+    'montage_file': 'data/montage.csv',
+    'pretrained_model': 'fnlp/bart-base-chinese',
+    'hidden_dim': 768, 
+    'n_timepoints': 1651,
+    'max_length': 16,
     
-    def forward(self, x):
-        batch_size, C, H, W = x.size()
-        x = x.view(batch_size, C * H, W).permute(0, 2, 1)
-        output, (hn, _) = self.lstm(x)
-        if self.lstm.bidirectional:
-            last_hidden = torch.cat((hn[-2], hn[-1]), dim=-1)
+    'disable_cross_region_attn': False, 
+    'uniform_region_weight': False,    
+    'cnn_only': False,                  
+    'disable_cross_modal': False,     
+    
+    'epochs': 100,
+    'batch_size': 4,          
+    'accumulation_steps': 8, 
+    'patience': 20,        
+    'grad_clip_norm': 5.0,  
+    'use_amp': False,       
+    
+    'brain_encoder_lr': 1e-4,   
+    'bart_decoder_lr': 1e-5,  
+    'bart_encoder_lr': 5e-6,     
+    'projection_lr': 5e-4,       
+    'warmup_steps': 1000,  
+    'weight_decay': 0.01,
+    'label_smoothing': 0.05,    
+    
+    'num_beams': 4,
+    'max_gen_length': 20,
+    'no_repeat_ngram_size': 2,
+    'length_penalty': 1.0,
+    'min_length': 3,
+    'do_sample': True,
+    'temperature': 0.8,
+    'top_k': 50,
+    
+    'train_split': 0.8,
+    'val_split': 0.1,
+    'val_max_samples': 2000,     
+    
+    'experiment_name': 'EEG-Chinese',
+    'save_dir': './checkpoints/',
+    'log_interval': 50,        
+    'eval_interval': 2,      
+    'save_every_n_epochs': 5,
+}
+
+def setup_model_and_data():
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    
+    tokenizer = AutoTokenizer.from_pretrained(CONFIG['pretrained_model'])
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.pad_token_id = tokenizer.eos_token_id
+    
+    dataset = EEGDataset(
+        CONFIG['data_dir'], 
+        CONFIG['montage_file'], 
+        tokenizer, 
+        max_length=CONFIG['max_length'],
+        data_augmentation=True,  
+    )
+    
+    stats = dataset.get_sample_stats()
+    region_channel_counts = stats['region_channel_counts']
+    
+    model = EEGDecodingModel(
+        n_timepoints=CONFIG['n_timepoints'],
+        region_channel_counts=region_channel_counts,
+        hidden_dim=CONFIG['hidden_dim'],
+        disable_cross_region_attn=CONFIG['disable_cross_region_attn'],
+        uniform_region_weight=CONFIG['uniform_region_weight'],
+        cnn_only=CONFIG['cnn_only'],
+        disable_cross_modal=CONFIG['disable_cross_modal'],
+    ).to(device)
+    
+    initialize_weights(model)
+    
+    n = len(dataset)
+    train_n = int(CONFIG['train_split'] * n)
+    val_n = int(CONFIG['val_split'] * n)
+    test_n = n - (train_n + val_n)
+    
+    train_ds, val_ds, test_ds = random_split(
+        dataset, [train_n, val_n, test_n],
+        generator=torch.Generator().manual_seed(42)
+    )
+    
+    train_loader = DataLoader(train_ds, batch_size=CONFIG['batch_size'], shuffle=True, num_workers=0, drop_last=True)
+    val_loader = DataLoader(val_ds, batch_size=CONFIG['batch_size'], shuffle=False, num_workers=0)
+    test_loader = DataLoader(test_ds, batch_size=CONFIG['batch_size'], shuffle=False, num_workers=0)
+    
+    logger.info(f"Data splits - Train: {train_n}, Val: {val_n}, Test: {test_n}")
+    
+    return model, tokenizer, train_loader, val_loader, test_loader, device
+
+def initialize_weights(model):
+    for name, param in model.named_parameters():
+        if 'bart' not in name.lower():
+            if 'weight' in name:
+                if 'norm' in name or 'layer_norm' in name:
+                    torch.nn.init.ones_(param)
+                elif 'embedding' in name:
+                    torch.nn.init.normal_(param, std=0.02)
+                elif len(param.shape) >= 2:
+                    torch.nn.init.xavier_uniform_(param, gain=0.02)
+            elif 'bias' in name:
+                torch.nn.init.zeros_(param)
+
+def setup_optimizer_and_scheduler(model, train_loader, config):
+    brain_encoder_params = []
+    bart_encoder_params = []
+    bart_decoder_params = []
+    projection_params = []
+    
+    for name, param in model.named_parameters():
+        if not param.requires_grad:
+            continue
+            
+        if 'brain_encoder' in name:
+            brain_encoder_params.append(param)
+        elif 'eeg_to_bart' in name or 'projection' in name:
+            projection_params.append(param)
+        elif 'bart' in name and 'encoder' in name:
+            bart_encoder_params.append(param)
+        elif 'bart' in name:
+            bart_decoder_params.append(param)
         else:
-            last_hidden = hn[-1]
-        logits = self.fc(last_hidden)
-        return F.log_softmax(logits, dim=-1)
+            projection_params.append(param)
+    
+    param_groups = []
+    
+    if brain_encoder_params:
+        param_groups.append({'params': brain_encoder_params, 'lr': config['brain_encoder_lr'], 'weight_decay': config['weight_decay']})
+    if projection_params:
+        param_groups.append({'params': projection_params, 'lr': config['projection_lr'], 'weight_decay': config['weight_decay']})
+    if bart_encoder_params:
+        param_groups.append({'params': bart_encoder_params, 'lr': config['bart_encoder_lr'], 'weight_decay': 0.0})
+    if bart_decoder_params:
+        param_groups.append({'params': bart_decoder_params, 'lr': config['bart_decoder_lr'], 'weight_decay': 0.0})
+    
+    optimizer = AdamW(param_groups, eps=1e-8, betas=(0.9, 0.999))
+    
+    total_steps = len(train_loader) * config['epochs'] // config['accumulation_steps']
+    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=config['warmup_steps'], num_training_steps=total_steps)
+    
+    return optimizer, scheduler
 
-class GNNBranch(nn.Module):
-    def __init__(self, node_feature_dim, hidden_dim, num_layers, vocab_size):
-        super(GNNBranch, self).__init__()
-        self.layers = nn.ModuleList()
-        self.layers.append(nn.Linear(node_feature_dim, hidden_dim))
-        for _ in range(num_layers - 1):
-            self.layers.append(nn.Linear(hidden_dim, hidden_dim))
-        self.fc = nn.Linear(hidden_dim, vocab_size)
+def safe_forward_pass(model, eeg, decoder_input_ids, labels, tokenizer, config):
+    try:
+        vocab_size = len(tokenizer.get_vocab())
         
-    def forward(self, x):
-        batch_size, C, H, W = x.size()
-        x_nodes = x.view(batch_size, C, -1).mean(dim=-1)
-        x_nodes = x_nodes.unsqueeze(-1)
-        adj = torch.ones(batch_size, C, C, device=x.device) / C
-        for layer in self.layers:
-            x_nodes = F.relu(torch.bmm(adj, layer(x_nodes)))
-        graph_embedding = x_nodes.mean(dim=1)
-        logits = self.fc(graph_embedding.squeeze(-1))
-        return F.log_softmax(logits, dim=-1)
+        if decoder_input_ids.max() >= vocab_size or (labels != -100).any() and labels[labels != -100].max() >= vocab_size:
+            return None
+        
+        outputs = model(
+            eeg_data=eeg,
+            decoder_input_ids=decoder_input_ids,
+            labels=labels,
+            label_smoothing_factor=config['label_smoothing'],
+            use_cache=False
+        )
+        
+        return outputs
+        
+    except RuntimeError as e:
+        if "CUDA error" in str(e) or "out of memory" in str(e):
+            torch.cuda.empty_cache()
+            return None
+        else:
+            raise e
 
-def ensemble_predictions(preds, losses):
-    weights = [1.0 / loss for loss in losses]
-    total_weight = sum(weights)
-    norm_weights = [w / total_weight for w in weights]
-    probs = [p.exp() for p in preds]
-    ensemble_prob = sum(w * p for w, p in zip(norm_weights, probs))
-    return torch.log(ensemble_prob + 1e-8)
-
-def train_branch(model, dataloader, optimizer, criterion, num_epochs=10, device='cuda'):
-    model.to(device)
+def train_epoch(model, train_loader, optimizer, scheduler, tokenizer, device, epoch, config):
     model.train()
-    for epoch in range(num_epochs):
-        epoch_loss = 0
-        for batch in tqdm(dataloader, desc=f"Epoch {epoch+1}/{num_epochs}"):
-            eeg = batch['eeg'].to(device)
-            target_ids = batch['target_ids'].to(device)
-            optimizer.zero_grad()
-            output = model(eeg)
-            loss = criterion(output, target_ids[:, 0])
+    total_loss = 0.0
+    total_samples = 0
+    accumulation_step = 0
+    
+    pbar = tqdm(train_loader, desc=f"Training Epoch {epoch+1}")
+    
+    for step, batch in enumerate(pbar):
+        try:
+            eeg = [region.to(device) for region in batch['eeg']]
+            decoder_input_ids = batch['decoder_input_ids'].to(device)
+            labels = batch['labels'].to(device)
+            
+            outputs = safe_forward_pass(model, eeg, decoder_input_ids, labels, tokenizer, config)
+            
+            if outputs is None or outputs.loss is None:
+                optimizer.zero_grad()
+                torch.cuda.empty_cache()
+                continue
+            
+            loss = outputs.loss / config['accumulation_steps']
+            
+            if torch.isnan(loss) or torch.isinf(loss):
+                optimizer.zero_grad()
+                continue
+            
             loss.backward()
-            optimizer.step()
-            epoch_loss += loss.item()
-        avg_loss = epoch_loss / len(dataloader)
-        tqdm.write(f"Epoch {epoch+1}/{num_epochs}, Loss: {avg_loss:.4f}")
+            accumulation_step += 1
+            
+            if accumulation_step >= config['accumulation_steps']:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), config['grad_clip_norm'])
+                optimizer.step()
+                optimizer.zero_grad()
+                scheduler.step()
+                accumulation_step = 0
+            
+            total_loss += outputs.loss.item() * len(labels)
+            total_samples += len(labels)
+            
+            if step % config['log_interval'] == 0:
+                current_lr = optimizer.param_groups[0]['lr']
+                pbar.set_postfix({'loss': f"{outputs.loss.item():.4f}", 'lr': f"{current_lr:.1e}"})
+                
+                wandb.log({
+                    "train/step_loss": outputs.loss.item(),
+                    "train/lr": current_lr,
+                    "step": epoch * len(train_loader) + step
+                })
+                
+        except RuntimeError as e:
+            if "out of memory" in str(e) or "CUDA error" in str(e):
+                torch.cuda.empty_cache()
+                optimizer.zero_grad()
+                continue
+            else:
+                raise e
+    
+    if accumulation_step > 0:
+        torch.nn.utils.clip_grad_norm_(model.parameters(), config['grad_clip_norm'])
+        optimizer.step()
+        optimizer.zero_grad()
+    
+    avg_loss = total_loss / total_samples if total_samples > 0 else float('inf')
     return avg_loss
 
-def predict_ensemble(eeg, models, losses, device='cuda'):
-    preds = []
-    for model in models:
-        model.to(device)
-        model.eval()
-        with torch.no_grad():
-            preds.append(model(eeg.to(device)))
-    ensemble_log_prob = ensemble_predictions(preds, losses)
-    return ensemble_log_prob
+def evaluate_model(model, val_loader, tokenizer, device, config):
+    model.eval()
+    all_predictions = []
+    all_targets = []
+    
+    with torch.no_grad():
+        for batch in tqdm(val_loader, desc="Evaluating", leave=False):
+            try:
+                eeg = [region.to(device) for region in batch['eeg']]
+                labels = batch['labels'].to(device)
+                
+                gen_config = {
+                    'max_length': config['max_gen_length'],
+                    'num_beams': config['num_beams'],
+                    'length_penalty': config['length_penalty'],
+                    'no_repeat_ngram_size': config['no_repeat_ngram_size'],
+                    'min_length': config['min_length'],
+                    'do_sample': False,
+                    'pad_token_id': tokenizer.pad_token_id,
+                    'eos_token_id': tokenizer.eos_token_id,
+                    'use_cache': False
+                }
+                
+                if config['num_beams'] > 1:
+                    gen_config['early_stopping'] = True
+                
+                generated_ids = model.generate(eeg_data=eeg, **gen_config)
+                
+                for i in range(len(generated_ids)):
+                    pred_text = tokenizer.decode(generated_ids[i], skip_special_tokens=True)
+                    all_predictions.append(pred_text.strip())
+                    
+                    target_ids = labels[i][labels[i] != -100]
+                    target_text = tokenizer.decode(target_ids, skip_special_tokens=True)
+                    all_targets.append(target_text.strip())
+                        
+            except Exception as e:
+                torch.cuda.empty_cache()
+                continue
+    
+    if not all_predictions:
+        return {'bleu_1': 0.0, 'bleu_2': 0.0, 'bleu_3': 0.0, 'bleu_4': 0.0, 'rouge_l_f': 0.0}
+    
+    try:
+        evaluator = ChineseEvaluator()
+        metrics = evaluator.compute_all_metrics(all_predictions, all_targets)
+    except:
+        metrics = {'bleu_1': 0.0, 'bleu_2': 0.0, 'bleu_3': 0.0, 'bleu_4': 0.0, 'rouge_l_f': 0.0}
+    
+    return metrics
+
+def save_checkpoint(model, optimizer, scheduler, epoch, metrics, save_path):
+    checkpoint = {
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'scheduler_state_dict': scheduler.state_dict(),
+        'metrics': metrics,
+    }
+    torch.save(checkpoint, save_path)
 
 def main():
-    directory = "/content/eeg"
-    batch_size = 8
-    test_split = 0.2
-    max_seq_len = 2500
-    in_channels = 1
-    embed_dim = 128
-    patch_size = 4
-    num_layers_vit = 6
-    num_heads = 8
-    vocab_size = 5000
-    hidden_dim_lstm = 256
-    num_layers_lstm = 3
-    node_feature_dim = 1
-    hidden_dim_gnn = 128
-    num_layers_gnn = 3
-
-    train_loader, test_loader, dataset = get_train_test_loaders(directory, batch_size, test_split, max_seq_len)
-    model_vit = ViTBranch(in_channels, embed_dim, patch_size, num_layers_vit, num_heads, vocab_size)
-    sample_eeg = dataset[0]['eeg']
-    C, H, W = sample_eeg.shape
-    input_dim_lstm = C * H
-    model_lstm = LSTMBranch(input_dim_lstm, hidden_dim_lstm, num_layers_lstm, vocab_size)
-    model_gnn = GNNBranch(node_feature_dim, hidden_dim_gnn, num_layers_gnn, vocab_size)
-    criterion = nn.NLLLoss()
-    optimizer_vit = optim.Adam(model_vit.parameters(), lr=1e-4)
-    optimizer_lstm = optim.Adam(model_lstm.parameters(), lr=1e-4)
-    optimizer_gnn = optim.Adam(model_gnn.parameters(), lr=1e-4)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    tqdm.write("Training ViT branch...")
-    loss_vit = train_branch(model_vit, train_loader, optimizer_vit, criterion, num_epochs=20, device=device)
-    tqdm.write("Training LSTM branch...")
-    loss_lstm = train_branch(model_lstm, train_loader, optimizer_lstm, criterion, num_epochs=20, device=device)
-    tqdm.write("Training GNN branch...")
-    loss_gnn = train_branch(model_gnn, train_loader, optimizer_gnn, criterion, num_epochs=20, device=device)
-    losses = [loss_vit, loss_lstm, loss_gnn]
-    models_list = [model_vit, model_lstm, model_gnn]
-    for batch in tqdm(test_loader, desc="Evaluating ensemble"):
-        eeg_batch = batch['eeg']
-        ensemble_log_prob = predict_ensemble(eeg_batch, models_list, losses, device=device)
-        print("Ensemble prediction (log-probs) shape:", ensemble_log_prob.shape)
-        break
+    wandb.init(project='EEG-Chinese', name=CONFIG['experiment_name'], config=CONFIG)
+    
+    model, tokenizer, train_loader, val_loader, test_loader, device = setup_model_and_data()
+    optimizer, scheduler = setup_optimizer_and_scheduler(model, train_loader, CONFIG)
+    
+    os.makedirs(CONFIG['save_dir'], exist_ok=True)
+    
+    best_bleu4 = 0.0
+    patience_counter = 0
+    
+    logger.info(f"Starting training for {CONFIG['epochs']} epochs...")
+    
+    for epoch in range(CONFIG['epochs']):
+        train_loss = train_epoch(model, train_loader, optimizer, scheduler, tokenizer, device, epoch, CONFIG)
+        
+        wandb.log({"train/epoch_loss": train_loss, "epoch": epoch})
+        
+        if (epoch + 1) % CONFIG['eval_interval'] == 0:
+            val_metrics = evaluate_model(model, val_loader, tokenizer, device, CONFIG)
+            
+            wandb.log({
+                "val/bleu_1": val_metrics['bleu_1'],
+                "val/bleu_2": val_metrics['bleu_2'],
+                "val/bleu_3": val_metrics['bleu_3'],
+                "val/bleu_4": val_metrics['bleu_4'],
+                "val/rouge_l": val_metrics['rouge_l_f'],
+                "epoch": epoch
+            })
+            
+            if val_metrics['bleu_4'] > best_bleu4:
+                best_bleu4 = val_metrics['bleu_4']
+                save_path = os.path.join(CONFIG['save_dir'], f"best_model.pth")
+                save_checkpoint(model, optimizer, scheduler, epoch, val_metrics, save_path)
+                patience_counter = 0
+            else:
+                patience_counter += 1
+            
+            if patience_counter >= CONFIG['patience']:
+                logger.info(f"Early stopping at epoch {epoch+1}")
+                break
+        
+        if (epoch + 1) % CONFIG['save_every_n_epochs'] == 0:
+            save_path = os.path.join(CONFIG['save_dir'], f"checkpoint_epoch_{epoch+1}.pth")
+            save_checkpoint(model, optimizer, scheduler, epoch, {}, save_path)
+    
+    logger.info(f"Training completed. Best BLEU-4: {best_bleu4:.3f}")
+    wandb.finish()
 
 if __name__ == "__main__":
+    torch.manual_seed(42)
+    np.random.seed(42)
     main()

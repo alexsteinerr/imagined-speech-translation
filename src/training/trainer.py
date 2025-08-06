@@ -1,0 +1,254 @@
+"""
+Training loop and utilities for EEG-to-text model.
+"""
+
+import os
+import time
+import torch
+import wandb
+import numpy as np
+from tqdm.auto import tqdm
+from ..evaluation.evaluator import ChineseEvaluator
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class EEGTrainer:
+    """
+    Trainer class for EEG-to-text model.
+    """
+    
+    def __init__(self, model, tokenizer, train_loader, val_loader, optimizer, scheduler, config):
+        self.model = model
+        self.tokenizer = tokenizer
+        self.train_loader = train_loader
+        self.val_loader = val_loader
+        self.optimizer = optimizer
+        self.scheduler = scheduler
+        self.config = config
+        
+        self.device = next(model.parameters()).device
+        self.evaluator = ChineseEvaluator()
+        
+        # Training state
+        self.best_bleu4 = 0.0
+        self.patience_counter = 0
+        self.global_step = 0
+
+    def safe_forward_pass(self, eeg, decoder_input_ids, labels):
+        """Safe forward pass with error handling."""
+        try:
+            vocab_size = len(self.tokenizer.get_vocab())
+            
+            # Validate token IDs
+            if decoder_input_ids.max() >= vocab_size:
+                return None
+            if (labels != -100).any() and labels[labels != -100].max() >= vocab_size:
+                return None
+            
+            outputs = self.model(
+                eeg_data=eeg,
+                decoder_input_ids=decoder_input_ids,
+                labels=labels,
+                label_smoothing_factor=self.config['label_smoothing']
+            )
+            
+            return outputs
+            
+        except RuntimeError as e:
+            if "CUDA error" in str(e) or "out of memory" in str(e):
+                torch.cuda.empty_cache()
+                return None
+            else:
+                raise e
+
+    def train_epoch(self, epoch):
+        """Train for one epoch."""
+        self.model.train()
+        total_loss = 0.0
+        total_samples = 0
+        accumulation_step = 0
+        
+        pbar = tqdm(self.train_loader, desc=f"Training Epoch {epoch+1}")
+        
+        for step, batch in enumerate(pbar):
+            try:
+                eeg = [region.to(self.device) for region in batch['eeg']]
+                decoder_input_ids = batch['decoder_input_ids'].to(self.device)
+                labels = batch['labels'].to(self.device)
+                
+                outputs = self.safe_forward_pass(eeg, decoder_input_ids, labels)
+                
+                if outputs is None or outputs.loss is None:
+                    self.optimizer.zero_grad()
+                    torch.cuda.empty_cache()
+                    continue
+                
+                loss = outputs.loss / self.config['accumulation_steps']
+                
+                if torch.isnan(loss) or torch.isinf(loss):
+                    self.optimizer.zero_grad()
+                    continue
+                
+                loss.backward()
+                accumulation_step += 1
+                
+                # Update every accumulation_steps
+                if accumulation_step >= self.config['accumulation_steps']:
+                    torch.nn.utils.clip_grad_norm_(
+                        self.model.parameters(), 
+                        self.config['grad_clip_norm']
+                    )
+                    self.optimizer.step()
+                    self.optimizer.zero_grad()
+                    self.scheduler.step()
+                    
+                    accumulation_step = 0
+                    self.global_step += 1
+                
+                total_loss += outputs.loss.item() * len(labels)
+                total_samples += len(labels)
+                
+                # Logging
+                if step % self.config['log_interval'] == 0:
+                    current_lr = self.optimizer.param_groups[0]['lr']
+                    pbar.set_postfix({
+                        'loss': f"{outputs.loss.item():.4f}",
+                        'lr': f"{current_lr:.1e}"
+                    })
+                    
+                    wandb.log({
+                        "train/step_loss": outputs.loss.item(),
+                        "train/lr": current_lr,
+                        "step": self.global_step
+                    })
+                    
+            except RuntimeError as e:
+                if "out of memory" in str(e) or "CUDA error" in str(e):
+                    torch.cuda.empty_cache()
+                    self.optimizer.zero_grad()
+                    continue
+                else:
+                    raise e
+        
+        # Handle remaining gradients
+        if accumulation_step > 0:
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config['grad_clip_norm'])
+            self.optimizer.step()
+            self.optimizer.zero_grad()
+        
+        avg_loss = total_loss / total_samples if total_samples > 0 else float('inf')
+        return avg_loss
+
+    def evaluate(self):
+        """Evaluate model on validation set."""
+        self.model.eval()
+        all_predictions = []
+        all_targets = []
+        
+        with torch.no_grad():
+            for batch in tqdm(self.val_loader, desc="Evaluating", leave=False):
+                try:
+                    eeg = [region.to(self.device) for region in batch['eeg']]
+                    labels = batch['labels'].to(self.device)
+                    
+                    gen_config = {
+                        'max_length': self.config['max_gen_length'],
+                        'num_beams': self.config['num_beams'],
+                        'length_penalty': self.config['length_penalty'],
+                        'no_repeat_ngram_size': self.config['no_repeat_ngram_size'],
+                        'min_length': self.config['min_length'],
+                        'do_sample': False,
+                        'pad_token_id': self.tokenizer.pad_token_id,
+                        'eos_token_id': self.tokenizer.eos_token_id
+                    }
+                    
+                    if self.config['num_beams'] > 1:
+                        gen_config['early_stopping'] = True
+                    
+                    generated_ids = self.model.generate(eeg_data=eeg, **gen_config)
+                    
+                    for i in range(len(generated_ids)):
+                        pred_text = self.tokenizer.decode(generated_ids[i], skip_special_tokens=True)
+                        all_predictions.append(pred_text.strip())
+                        
+                        target_ids = labels[i][labels[i] != -100]
+                        target_text = self.tokenizer.decode(target_ids, skip_special_tokens=True)
+                        all_targets.append(target_text.strip())
+                            
+                except Exception:
+                    torch.cuda.empty_cache()
+                    continue
+        
+        if not all_predictions:
+            return {'bleu_1': 0.0, 'bleu_2': 0.0, 'bleu_3': 0.0, 'bleu_4': 0.0, 'rouge_l_f': 0.0}
+        
+        try:
+            metrics = self.evaluator.compute_all_metrics(all_predictions, all_targets)
+        except:
+            metrics = {'bleu_1': 0.0, 'bleu_2': 0.0, 'bleu_3': 0.0, 'bleu_4': 0.0, 'rouge_l_f': 0.0}
+        
+        return metrics
+
+    def save_checkpoint(self, epoch, metrics, save_path):
+        """Save model checkpoint."""
+        checkpoint = {
+            'epoch': epoch,
+            'model_state_dict': self.model.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+            'scheduler_state_dict': self.scheduler.state_dict(),
+            'metrics': metrics,
+            'config': self.config,
+            'global_step': self.global_step
+        }
+        torch.save(checkpoint, save_path)
+        logger.info(f"Saved checkpoint: {save_path}")
+
+    def train(self):
+        """Main training loop."""
+        logger.info(f"Starting training for {self.config['epochs']} epochs...")
+        
+        for epoch in range(self.config['epochs']):
+            # Training
+            train_loss = self.train_epoch(epoch)
+            
+            wandb.log({
+                "train/epoch_loss": train_loss,
+                "epoch": epoch
+            })
+            
+            # Evaluation
+            if (epoch + 1) % self.config['eval_interval'] == 0:
+                val_metrics = self.evaluate()
+                bleu4 = val_metrics['bleu_4']
+                
+                wandb.log({
+                    "val/bleu_1": val_metrics['bleu_1'],
+                    "val/bleu_4": bleu4,
+                    "val/rouge_l": val_metrics['rouge_l_f'],
+                    "epoch": epoch
+                })
+                
+                # Save best model
+                if bleu4 > self.best_bleu4:
+                    self.best_bleu4 = bleu4
+                    save_path = os.path.join(self.config['save_dir'], "best_model.pth")
+                    self.save_checkpoint(epoch, val_metrics, save_path)
+                    logger.info(f"New best BLEU-4: {bleu4:.3f}")
+                    self.patience_counter = 0
+                else:
+                    self.patience_counter += 1
+                
+                # Early stopping
+                if self.patience_counter >= self.config['patience']:
+                    logger.info(f"Early stopping at epoch {epoch+1}")
+                    break
+            
+            # Regular checkpoints
+            if (epoch + 1) % self.config['save_every_n_epochs'] == 0:
+                save_path = os.path.join(self.config['save_dir'], f"checkpoint_epoch_{epoch+1}.pth")
+                self.save_checkpoint(epoch, {}, save_path)
+        
+        logger.info(f"Training completed. Best BLEU-4: {self.best_bleu4:.3f}")
+        return self.best_bleu4
