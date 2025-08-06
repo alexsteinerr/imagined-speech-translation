@@ -11,28 +11,19 @@ def get_electrode_regions():
     """
     return {
         'frontal': [
-            'AF3', 'AF4', 'AF7', 'AFF5h', 'AFF6h', 'AFz',
-            'F1', 'F2', 'F3', 'F4', 'F5', 'F7', 'Fz',
-            'FC1', 'FC2', 'FC3', 'FC4', 'FC5', 'FC6', 'FCz',
-            'FCC3h', 'FCC4h', 'FCC5h', 'FCC6h', 'FCCz',
-            'FFC3h', 'FFC4h', 'FFC5h', 'FFC6h',
-            'Fp1', 'Fp2', 'Fpz'
+            'FC5', 'F5', 'F7', 'F3', 'FC1', 'F1', 'AF3', 'Fz',
+            'FC2', 'F2', 'AF4', 'Fp2', 'F4', 'F6', 'F8', 'FC6'
         ],
         'temporal': [
-            'FFT7h', 'FFT8h', 'FTT7h', 'FTT8h',
-            'Ft7', 'T7', 'T8',
-            'TP7', 'TP8',
-            'TPP5h', 'TTP7h', 'TTP8h'
+            'T9', 'FT9', 'T7', 'TP7', 'FT8', 'T10', 'FT10', 'T8', 'TP8'
         ],
         'central': [
-            'C1', 'C2', 'C3', 'C4', 'Cz',
-            'CCP1h', 'CCP2h', 'CCP3h', 'CCP4h'
+            'C5', 'C3', 'FC3', 'C1', 'CP1', 'Cz',
+            'CP2', 'C2', 'C4', 'FC4', 'C6'
         ],
         'parietal': [
-            'P3', 'P4', 'P5', 'P6', 'P7', 'P8',
-            'CP3', 'CP4',
-            'CPP5h', 'CPP6h',
-            'POz'
+            'P7', 'P5', 'CP3', 'P3', 'PO3', 'PO1',
+            'PO2', 'P4', 'PO4', 'P6', 'CP4', 'P8'
         ]
     }
 
