@@ -1,6 +1,6 @@
 import os
 import pickle
-import utils
+from . import utils
 from torch.utils.data import Dataset
 import numpy as np
 import pandas as pd
