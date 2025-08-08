@@ -173,15 +173,7 @@ class BARTDecoder(nn.Module):
 
     def forward(self, eeg_feat, decoder_input_ids=None, labels=None, **kwargs):
         """
-        Enhanced forward pass with stronger EEG conditioning.
-        
-        Args:
-            eeg_feat: EEG features of shape (batch_size, hidden_dim)
-            decoder_input_ids: Decoder input token IDs
-            labels: Target token IDs for training
-        
-        Returns:
-            Enhanced BART model outputs
+        Enhanced forward pass with hidden state output.
         """
         try:
             batch_size = eeg_feat.shape[0]
@@ -203,16 +195,27 @@ class BARTDecoder(nn.Module):
                 attentions=attention_weights
             )
             
-            # Run BART with EEG-conditioned encoder
+            # IMPORTANT: Enable output_hidden_states
             bart_outputs = self.bart(
                 input_ids=None,
                 attention_mask=encoder_attention_mask,
                 encoder_outputs=encoder_outputs,
                 decoder_input_ids=decoder_input_ids,
                 labels=labels,
+                output_hidden_states=True,  # <-- ADD THIS
                 return_dict=True,
+                use_cache=False,  # <-- Disable cache during training
                 **kwargs
             )
+            
+            # Extract decoder hidden states if available
+            decoder_hidden = None
+            if hasattr(bart_outputs, 'decoder_hidden_states') and bart_outputs.decoder_hidden_states is not None:
+                # Use the last layer's hidden states
+                decoder_hidden = bart_outputs.decoder_hidden_states[-1]
+            
+            # Add decoder hidden states to output
+            bart_outputs.decoder_hidden = decoder_hidden
             
             return bart_outputs
             
@@ -224,8 +227,9 @@ class BARTDecoder(nn.Module):
             
             dummy_logits = torch.zeros(batch_size, seq_len, vocab_size, device=eeg_feat.device)
             dummy_loss = torch.tensor(5.0, device=eeg_feat.device, requires_grad=True)
-            return Seq2SeqLMOutput(loss=dummy_loss, logits=dummy_logits)
-
+            return Seq2SeqLMOutput(loss=dummy_loss, logits=dummy_logits, decoder_hidden=None)
+        
+        
     def generate_from_eeg(self, eeg_feat, max_length=32, **kwargs):
         """
         Generate text from EEG features with enhanced conditioning.

@@ -1,170 +1,228 @@
 """
-Training configuration for EEG-to-text model.
+Optimized training configuration for EEG-to-text model with composite loss.
 """
 
 CONFIG = {
-    # Data and paths
     'data_dir': 'data/eeg_data/',
     'montage_file': 'data/montage.csv',
     'save_dir': './checkpoints/',
     
-    # Model configuration 
     'pretrained_model': 'fnlp/bart-base-chinese',
     'hidden_dim': 768,
     'n_timepoints': 1651,
-    'max_length': 16, 
+    'max_length': 16,
     
-    # Model architecture options - 
-    'disable_cross_region_attn': False,
-    'uniform_region_weight': False,
-    'cnn_only': False,
-    'disable_cross_modal': False,
+    # Model architecture flags
+    'disable_cross_region_attn': False, 
+    'uniform_region_weight': False,  
+    'cnn_only': False,             
     
-    # Training parameters
     'epochs': 100,
-    'batch_size': 4,  
-    'accumulation_steps': 8, 
-    'patience': 20,
-    'grad_clip_norm': 1.0, 
+    'batch_size': 4,
+    'accumulation_steps': 8,  # Effective batch size = 32
+    'patience': 15,          
+    'grad_clip_norm': 1.0,
     
-    # Learning rates 
-    'brain_encoder_lr': 5e-4,   
-    'bart_decoder_lr': 5e-5,     
-    'bart_encoder_lr': 1e-5,  
-    'projection_lr': 1e-3,    
-    'warmup_steps': 1000,
+    'brain_encoder_lr': 3e-4,    
+    'bart_decoder_lr': 3e-5,    
+    'projection_lr': 5e-4,    
+    'warmup_steps': 500,      
     'weight_decay': 0.01,
-    'label_smoothing': 0.01,  
-
-    # Generation parameters
-    'num_beams': 3,             
-    'max_gen_length': 18,      
-    'no_repeat_ngram_size': 2,
-    'length_penalty': 0.8,    
-    'min_length': 4,             
-    'do_sample': False,     
-    'temperature': 0.7,   
-    'top_k': 40,           
-    'top_p': 0.85,          
     
-    # Data splits
+    'loss_weights': {
+        'ce': 1.0,          
+        'align': 0.5,        
+        'bow': 0.15,     
+        'div': 0.1,      
+        'var': 0.05,         
+    },
+    
+    'use_adaptive_loss': True,
+    'adaptation_rate': 0.01,
+    'adaptation_patience': 5,  
+
+    'label_smoothing': 0.05,  
+    'bow_vocab_size': 2000, 
+    'contrastive_tau': 0.07,   
+
+    'generation': {
+        'eval': {
+            'num_beams': 5,         
+            'max_length': 18,
+            'min_length': 4,
+            'no_repeat_ngram_size': 3,
+            'repetition_penalty': 1.3,  
+            'length_penalty': 1.0,   
+            'diversity_penalty': 0.5,    
+            'num_beam_groups': 2,       
+            'early_stopping': True,
+        },
+        'train': {
+            'do_sample': True,
+            'max_length': 18,
+            'min_length': 4,
+            'temperature': 0.8,
+            'top_p': 0.9,             
+            'top_k': 50,
+            'repetition_penalty': 1.2,
+            'no_repeat_ngram_size': 2,
+        }
+    },
+    
     'train_split': 0.8,
     'val_split': 0.1,
-    'val_max_samples': 2000,
-    
-    # Experiment settings
-    'experiment_name': 'EEG-Chinese-Fixed',  
-    'log_interval': 25,        
-    'eval_interval': 1,       
-    'save_every_n_epochs': 3,    
-    
-    # Advanced training options
-    'use_amp': False,
-    'find_unused_parameters': True,
-    'dataloader_num_workers': 0,
-    'pin_memory': True,
-    'persistent_workers': False,
-    
-    # Regularization
-    'dropout_rate': 0.08,     
-    'attention_dropout': 0.05,  
-    'classifier_dropout': 0.1,
-    
-    # Data augmentation 
-    'data_augmentation': True,
-    'augment_prob': 0.1,       
-    'noise_std_ratio': 0.008,   
-    'scale_range': (0.99, 1.01), 
-    
-    # Validation and testing
-    'val_check_interval': 0.5,
     'test_split': 0.1,
-    'early_stopping_metric': 'bleu_4',
-    'early_stopping_mode': 'max',
+    'batch_size': 4,
+    'num_workers': 0,         
+
+    'augmentation': {
+        'enabled': True,
+        'noise_std': 0.01, 
+        'scale_range': (0.95, 1.05), 
+        'time_shift': 2,     
+    },
     
-    # Logging and monitoring
-    'log_every_n_steps': 10,
-    'save_top_k': 3,
-    'monitor_metric': 'val_bleu_4',
-    'log_predictions': True,
-    'max_prediction_examples': 8,  
+    'experiment_name': 'EEG-Chinese-CompositeLoss',
+    'log_interval': 20,      
+    'eval_interval': 1,      
+    'save_interval': 5,       
     
-    # Model specific parameters
-    'freeze_bart_encoder': False,
-    'freeze_bart_embeddings': False, 
-    'region_attention_heads': 8,
-    'region_fusion_layers': 1,
+    # Metrics to track
+    'monitor_metrics': {
+        'primary': 'val_bleu_4',          
+        'secondary': 'val_diversity_score',
+        'early_stopping': 'val_bleu_4',
+        'mode': 'max',
+    },
     
-    # EEG-SPECIFIC PARAMETERS
-    'eeg_conditioning_strength_init': 0.7, 
-    'eeg_conditioning_clamp_min': 0.3,  
-    'eeg_conditioning_clamp_max': 1.2,      
-    'encoder_sequence_length': 24,        
-    'eeg_projection_layers': 3,        
-    
-    # Reproducibility
     'seed': 42,
     'deterministic': True,
-    'benchmark': False,
+    'mixed_precision': False, 
+    
+    # Thresholds and limits
+    'min_diversity_score': 0.3,
+    'max_diversity_score': 0.8,  
+    'max_gradient_norm': 1.0,
+    
 }
 
-def get_optimizer_config():
-    """Get optimizer-specific configuration."""
-    return {
-        'brain_encoder_lr': CONFIG['brain_encoder_lr'],
-        'bart_decoder_lr': CONFIG['bart_decoder_lr'],
-        'bart_encoder_lr': CONFIG['bart_encoder_lr'],
-        'projection_lr': CONFIG['projection_lr'],
-        'warmup_steps': CONFIG['warmup_steps'],
-        'weight_decay': CONFIG['weight_decay'],
+def get_optimizer_groups(model):
+    """
+    Create parameter groups with different learning rates.
+    More granular than before for better control.
+    """
+    groups = {
+        'brain_encoder': [],
+        'projection': [],
+        'bart_decoder': [],
+        'loss_heads': [],  # BoW and alignment projections
     }
+    
+    for name, param in model.named_parameters():
+        if not param.requires_grad:
+            continue
+            
+        if 'brain_encoder' in name:
+            groups['brain_encoder'].append(param)
+        elif 'eeg_to_bart' in name or 'projection' in name:
+            groups['projection'].append(param)
+        elif 'bow_head' in name or '_proj' in name:
+            groups['loss_heads'].append(param)
+        elif 'bart' in name:
+            groups['bart_decoder'].append(param)
+        else:
+            groups['projection'].append(param)  # Default group
+    
+    param_groups = [
+        {'params': groups['brain_encoder'], 'lr': CONFIG['brain_encoder_lr']},
+        {'params': groups['projection'], 'lr': CONFIG['projection_lr']},
+        {'params': groups['bart_decoder'], 'lr': CONFIG['bart_decoder_lr']},
+        {'params': groups['loss_heads'], 'lr': CONFIG['projection_lr'] * 0.5},
+    ]
+    
+    # Filter out empty groups
+    param_groups = [g for g in param_groups if g['params']]
+    
+    # Add weight decay
+    for group in param_groups:
+        group['weight_decay'] = CONFIG['weight_decay']
+    
+    return param_groups
 
 
-def get_generation_config():
-    """Get text generation configuration."""
+def get_loss_config():
+    """Get composite loss configuration."""
     return {
-        'num_beams': CONFIG['num_beams'],
-        'max_gen_length': CONFIG['max_gen_length'],
-        'no_repeat_ngram_size': CONFIG['no_repeat_ngram_size'],
-        'length_penalty': CONFIG['length_penalty'],
-        'min_length': CONFIG['min_length'],
-        'do_sample': CONFIG['do_sample'],
-        'temperature': CONFIG['temperature'],
-        'top_k': CONFIG['top_k'],
-        'top_p': CONFIG['top_p'],
-    }
-
-
-def get_data_config():
-    """Get data processing configuration."""
-    return {
-        'data_dir': CONFIG['data_dir'],
-        'montage_file': CONFIG['montage_file'],
-        'max_length': CONFIG['max_length'],
-        'train_split': CONFIG['train_split'],
-        'val_split': CONFIG['val_split'],
-        'test_split': CONFIG['test_split'],
-        'batch_size': CONFIG['batch_size'],
-        'dataloader_num_workers': CONFIG['dataloader_num_workers'],
-        'pin_memory': CONFIG['pin_memory'],
-        'persistent_workers': CONFIG['persistent_workers'],
-        'data_augmentation': CONFIG['data_augmentation'],
-        'augment_prob': CONFIG['augment_prob'],
-        'noise_std_ratio': CONFIG['noise_std_ratio'],
-        'scale_range': CONFIG['scale_range'],
-    }
-
-
-def get_training_config():
-    """Get training-specific configuration."""
-    return {
-        'epochs': CONFIG['epochs'],
-        'accumulation_steps': CONFIG['accumulation_steps'],
-        'grad_clip_norm': CONFIG['grad_clip_norm'],
-        'patience': CONFIG['patience'],
+        'vocab_size': None,
+        'hidden_dim': CONFIG['hidden_dim'],
+        'pad_token_id': None, 
+        'bow_indices': None,
         'label_smoothing': CONFIG['label_smoothing'],
-        'use_amp': CONFIG['use_amp'],
-        'gradient_checkpointing': CONFIG['gradient_checkpointing'],
-        'freeze_bart_encoder': CONFIG['freeze_bart_encoder'],
-        'freeze_bart_embeddings': CONFIG['freeze_bart_embeddings'],
+        'w_ce': CONFIG['loss_weights']['ce'],
+        'w_align': CONFIG['loss_weights']['align'],
+        'w_bow': CONFIG['loss_weights']['bow'],
+        'w_div': CONFIG['loss_weights']['div'],
+        'w_var': CONFIG['loss_weights']['var'],
+        'tau': CONFIG['contrastive_tau'],
     }
+
+
+def get_scheduler_config(num_training_steps):
+    """Get learning rate scheduler configuration."""
+    return {
+        'scheduler_type': 'cosine_with_warmup', 
+        'num_warmup_steps': CONFIG['warmup_steps'],
+        'num_training_steps': num_training_steps,
+        'min_lr_ratio': 0.1
+    }
+
+
+def should_trigger_adaptation(metrics):
+    """
+    Determine if loss weight adaptation should be triggered.
+    
+    Args:
+        metrics: Dictionary of current metrics
+        
+    Returns:
+        str: Adaptation action ('increase_div', 'decrease_div', or None)
+    """
+    diversity = metrics.get('diversity_score', 0.5)
+    
+    if diversity < CONFIG['min_diversity_score']:
+        return 'increase_diversity'
+    elif diversity > CONFIG['max_diversity_score']:
+        return 'decrease_diversity'
+    
+    # Check for repetitive generation
+    if metrics.get('unique_ratio', 1.0) < 0.5:
+        return 'increase_diversity'
+    
+    return None
+
+
+def update_loss_weights(current_weights, action, rate=None):
+    """
+    Update loss weights based on adaptation action.
+    
+    Args:
+        current_weights: Current loss weight dictionary
+        action: Adaptation action string
+        rate: Adaptation rate (uses CONFIG default if None)
+        
+    Returns:
+        Updated weights dictionary
+    """
+    rate = rate or CONFIG['adaptation_rate']
+    weights = current_weights.copy()
+    
+    if action == 'increase_diversity':
+        weights['div'] = min(0.3, weights['div'] * (1 + rate))
+        weights['var'] = min(0.15, weights['var'] * (1 + rate))
+        weights['align'] = min(0.7, weights['align'] * (1 + rate * 0.5))
+        
+    elif action == 'decrease_diversity':
+        weights['div'] = max(0.05, weights['div'] * (1 - rate))
+        weights['var'] = max(0.02, weights['var'] * (1 - rate))
+        
+    return weights

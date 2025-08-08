@@ -5,8 +5,6 @@ Enhanced neural network layers for EEG processing with improved feature extracti
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
-
 
 class Conv1DWithAttention(nn.Module):
     """
@@ -125,8 +123,8 @@ class Conv1DWithAttention(nn.Module):
             nn.LayerNorm(hidden_dim)
         )
         
-        # Feature diversity encouragement
-        self.diversity_head = nn.Linear(hidden_dim, hidden_dim // 4)
+        # Feature diversity encouragement - FIXED: ensure dimension matches
+        self.diversity_head = nn.Linear(hidden_dim, hidden_dim)  # Changed from hidden_dim // 4
 
     def forward(self, x):
         """
@@ -191,9 +189,6 @@ class Conv1DWithAttention(nn.Module):
             attn_weights = F.softmax(torch.sum(x * mean_pool.unsqueeze(1), dim=2), dim=1)
             attn_pool = torch.sum(x * attn_weights.unsqueeze(2), dim=1)
             
-            # Combine different pooling strategies
-            pooled = torch.cat([mean_pool, max_pool, attn_pool], dim=1)
-            
             # Multi-scale projection
             projections = []
             for i, proj_layer in enumerate(self.multi_scale_proj):
@@ -205,7 +200,11 @@ class Conv1DWithAttention(nn.Module):
                     projections.append(proj_layer(attn_pool))
             
             combined = torch.cat(projections, dim=1)
-            return self.projection(combined)
+            final_feat = self.projection(combined)
+            
+            # Add diversity component - FIXED: ensure proper dimensions
+            diversity_feat = self.diversity_head(final_feat)
+            return final_feat + 0.1 * F.normalize(diversity_feat, dim=-1)
         
         # Enhanced attention processing
         x = x.transpose(1, 2)  # (batch, time, channels)
@@ -267,7 +266,7 @@ class Conv1DWithAttention(nn.Module):
         multi_scale_combined = torch.cat(projections, dim=1)
         final_feat = self.projection(multi_scale_combined)
         
-        # Add diversity component
+        # Add diversity component 
         diversity_feat = self.diversity_head(final_feat)
         
         return final_feat + 0.1 * F.normalize(diversity_feat, dim=-1)
