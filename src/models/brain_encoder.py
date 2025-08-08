@@ -65,14 +65,14 @@ class BrainRegionEncoder(nn.Module):
         if not disable_cross_region_attn:
             encoder_layer = nn.TransformerEncoderLayer(
                 d_model=hidden_dim,
-                nhead=12,  # Increased from 8
-                dim_feedforward=hidden_dim * 4,  # Increased from 2
+                nhead=12,  
+                dim_feedforward=hidden_dim * 4,  
                 dropout=0.1,
                 activation='gelu',
                 batch_first=True,
                 norm_first=True
             )
-            self.fusion_transformer = nn.TransformerEncoder(encoder_layer, num_layers=2)  # Increased layers
+            self.fusion_transformer = nn.TransformerEncoder(encoder_layer, num_layers=2) 
             
             # Add cross-region attention mechanism
             self.cross_region_attention = nn.MultiheadAttention(
