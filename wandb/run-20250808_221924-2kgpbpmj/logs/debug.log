@@ -1,0 +1,21 @@
+2025-08-08 22:19:24,852 INFO    MainThread:2124 [wandb_setup.py:_flush():80] Current SDK version is 0.21.0
+2025-08-08 22:19:24,852 INFO    MainThread:2124 [wandb_setup.py:_flush():80] Configure stats pid to 2124
+2025-08-08 22:19:24,852 INFO    MainThread:2124 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Marco\.config\wandb\settings
+2025-08-08 22:19:24,852 INFO    MainThread:2124 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Marco\Desktop\Inner Speech Translation\wandb\settings
+2025-08-08 22:19:24,852 INFO    MainThread:2124 [wandb_setup.py:_flush():80] Loading settings from environment variables
+2025-08-08 22:19:24,853 INFO    MainThread:2124 [wandb_init.py:setup_run_log_directory():703] Logging user logs to C:\Users\Marco\Desktop\Inner Speech Translation\wandb\run-20250808_221924-2kgpbpmj\logs\debug.log
+2025-08-08 22:19:24,853 INFO    MainThread:2124 [wandb_init.py:setup_run_log_directory():704] Logging internal logs to C:\Users\Marco\Desktop\Inner Speech Translation\wandb\run-20250808_221924-2kgpbpmj\logs\debug-internal.log
+2025-08-08 22:19:24,853 INFO    MainThread:2124 [wandb_init.py:init():830] calling init triggers
+2025-08-08 22:19:24,853 INFO    MainThread:2124 [wandb_init.py:init():835] wandb.init called with sweep_config: {}
+config: {'data_dir': 'data/eeg_data/', 'montage_file': 'data/montage.csv', 'save_dir': './checkpoints/', 'pretrained_model': 'fnlp/bart-base-chinese', 'hidden_dim': 768, 'n_timepoints': 1651, 'max_length': 16, 'disable_cross_region_attn': False, 'uniform_region_weight': False, 'cnn_only': False, 'epochs': 100, 'batch_size': 4, 'accumulation_steps': 8, 'patience': 15, 'grad_clip_norm': 1.0, 'brain_encoder_lr': 0.0003, 'bart_decoder_lr': 3e-05, 'projection_lr': 0.0005, 'warmup_steps': 500, 'weight_decay': 0.01, 'loss_weights': {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.1, 'var': 0.05}, 'use_adaptive_loss': True, 'adaptation_rate': 0.01, 'adaptation_patience': 5, 'label_smoothing': 0.05, 'bow_vocab_size': 2000, 'contrastive_tau': 0.07, 'generation': {'eval': {'num_beams': 5, 'max_length': 18, 'min_length': 4, 'no_repeat_ngram_size': 3, 'repetition_penalty': 1.3, 'length_penalty': 1.0, 'diversity_penalty': 0.5, 'num_beam_groups': 2, 'early_stopping': True}, 'train': {'do_sample': True, 'max_length': 18, 'min_length': 4, 'temperature': 0.8, 'top_p': 0.9, 'top_k': 50, 'repetition_penalty': 1.2, 'no_repeat_ngram_size': 2}}, 'train_split': 0.8, 'val_split': 0.1, 'test_split': 0.1, 'num_workers': 0, 'augmentation': {'enabled': True, 'noise_std': 0.01, 'scale_range': (0.95, 1.05), 'time_shift': 2}, 'experiment_name': 'EEG-Chinese-CompositeLoss', 'log_interval': 20, 'eval_interval': 1, 'save_interval': 5, 'monitor_metrics': {'primary': 'val_bleu_4', 'secondary': 'val_diversity_score', 'early_stopping': 'val_bleu_4', 'mode': 'max'}, 'seed': 42, 'deterministic': True, 'mixed_precision': False, 'min_diversity_score': 0.3, 'max_diversity_score': 0.8, 'max_gradient_norm': 1.0, '_wandb': {}}
+2025-08-08 22:19:24,853 INFO    MainThread:2124 [wandb_init.py:init():871] starting backend
+2025-08-08 22:19:25,070 INFO    MainThread:2124 [wandb_init.py:init():874] sending inform_init request
+2025-08-08 22:19:25,259 INFO    MainThread:2124 [wandb_init.py:init():882] backend started and connected
+2025-08-08 22:19:25,260 INFO    MainThread:2124 [wandb_init.py:init():953] updated telemetry
+2025-08-08 22:19:25,291 INFO    MainThread:2124 [wandb_init.py:init():977] communicating run to backend with 90.0 second timeout
+2025-08-08 22:19:25,982 INFO    MainThread:2124 [wandb_init.py:init():1029] starting run threads in backend
+2025-08-08 22:19:26,430 INFO    MainThread:2124 [wandb_run.py:_console_start():2458] atexit reg
+2025-08-08 22:19:26,430 INFO    MainThread:2124 [wandb_run.py:_redirect():2306] redirect: wrap_raw
+2025-08-08 22:19:26,431 INFO    MainThread:2124 [wandb_run.py:_redirect():2375] Wrapping output streams.
+2025-08-08 22:19:26,431 INFO    MainThread:2124 [wandb_run.py:_redirect():2398] Redirects installed.
+2025-08-08 22:19:26,433 INFO    MainThread:2124 [wandb_init.py:init():1075] run started, returning control to user process

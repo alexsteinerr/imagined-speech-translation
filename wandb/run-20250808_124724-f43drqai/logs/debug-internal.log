@@ -4,3 +4,4 @@
 {"time":"2025-08-08T12:47:25.5174147+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"f43drqai"}
 {"time":"2025-08-08T12:47:25.5174147+02:00","level":"INFO","msg":"sender: started","stream_id":"f43drqai"}
 {"time":"2025-08-08T12:47:25.5174147+02:00","level":"INFO","msg":"handler: started","stream_id":"f43drqai"}
+{"time":"2025-08-08T18:24:12.848377+02:00","level":"INFO","msg":"api: retrying HTTP error","status":502,"url":"https://api.wandb.ai/files/steiner-alex-h-farm/EEG-Chinese/f43drqai/file_stream","body":"\n<html><head>\n<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\n<title>502 Server Error</title>\n</head>\n<body text=#000000 bgcolor=#ffffff>\n<h1>Error: Server Error</h1>\n<h2>The server encountered a temporary error and could not complete your request.<p>Please try again in 30 seconds.</h2>\n<h2></h2>\n</body></html>\n"}
