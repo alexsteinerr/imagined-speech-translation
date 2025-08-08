@@ -1,0 +1,101 @@
+2025-08-08 12:32:14,172 - __main__ - INFO - W&B initialized: EEG-Chinese-CompositeLoss
+2025-08-08 12:32:14,172 - __main__ - INFO - Loading tokenizer...
+2025-08-08 12:32:14,492 - __main__ - INFO - Tokenizer loaded. Vocab size: 51271
+2025-08-08 12:32:14,493 - __main__ - INFO - Creating model...
+C:\Users\Marco\anaconda3\Lib\site-packages\torch\nn\modules\transformer.py:307: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+2025-08-08 12:32:17,076 - __main__ - INFO - Custom weights initialized
+2025-08-08 12:32:17,079 - __main__ - INFO - Model created. Total params: 366,039,177, Trainable: 366,039,177
+2025-08-08 12:32:17,079 - __main__ - INFO - Loading dataset...
+2025-08-08 12:32:17,090 - src.data.dataset - INFO - Tokenizer vocabulary size: 51271
+2025-08-08 12:32:17,092 - src.data.dataset - INFO - Frontal region: 16 channels - ['FC5', 'F5', 'F7', 'F3', 'FC1', 'F1', 'AF3', 'Fz', 'FC2', 'F2', 'AF4', 'Fp2', 'F4', 'F6', 'F8', 'FC6']
+2025-08-08 12:32:17,093 - src.data.dataset - INFO - Temporal region: 9 channels - ['T9', 'FT9', 'T7', 'TP7', 'FT8', 'T10', 'FT10', 'T8', 'TP8']
+2025-08-08 12:32:17,093 - src.data.dataset - INFO - Central region: 11 channels - ['C5', 'C3', 'FC3', 'C1', 'CP1', 'Cz', 'CP2', 'C2', 'C4', 'FC4', 'C6']
+2025-08-08 12:32:17,093 - src.data.dataset - INFO - Parietal region: 12 channels - ['P7', 'P5', 'CP3', 'P3', 'PO3', 'PO1', 'PO2', 'P4', 'PO4', 'P6', 'CP4', 'P8']
+2025-08-08 12:32:17,093 - src.data.dataset - INFO - Total channels mapped: 48/125
+2025-08-08 12:32:17,093 - src.data.dataset - INFO - Tokenizer validation passed. Key IDs: pad=0, eos=104, bos=101
+Discovering data files...
+2025-08-08 12:32:17,094 - src.data.dataset - INFO - Found 225 .pkl files
+2025-08-08 12:32:40,746 - src.data.dataset - INFO - Built index for 29466 samples
+Computing normalization parameters from sample...
+2025-08-08 12:32:50,893 - src.data.dataset - INFO - Fitted scaler for frontal with 100 samples
+2025-08-08 12:32:50,912 - src.data.dataset - INFO - Fitted scaler for temporal with 100 samples
+2025-08-08 12:32:50,938 - src.data.dataset - INFO - Fitted scaler for central with 100 samples
+2025-08-08 12:32:50,966 - src.data.dataset - INFO - Fitted scaler for parietal with 100 samples
+Dataset initialized with 29466 samples
+2025-08-08 12:32:51,072 - __main__ - INFO - Dataset loaded: 29466 samples
+2025-08-08 12:32:51,073 - __main__ - INFO - Region channel counts: {'frontal': 16, 'temporal': 9, 'central': 11, 'parietal': 12}
+2025-08-08 12:32:51,078 - __main__ - INFO - Data splits - Train: 23572, Val: 2946, Test: 2948
+2025-08-08 12:32:51,079 - __main__ - INFO - Param group 0: 210,801,736 params, lr=3.00e-04
+2025-08-08 12:32:51,079 - __main__ - INFO - Param group 1: 4,730,112 params, lr=5.00e-04
+2025-08-08 12:32:51,081 - __main__ - INFO - Param group 2: 100,897,601 params, lr=3.00e-05
+2025-08-08 12:32:51,081 - __main__ - INFO - Param group 3: 49,609,728 params, lr=2.50e-04
+C:\Users\Marco\anaconda3\Lib\site-packages\transformers\optimization.py:591: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
+  warnings.warn(
+2025-08-08 12:32:51,084 - __main__ - INFO - Training steps: 73600 total, 500 warmup
+2025-08-08 12:32:51,085 - __main__ - INFO - Optimizer and cosine scheduler created
+2025-08-08 12:32:51,085 - __main__ - INFO - Checkpoints will be saved to: ./checkpoints/
+2025-08-08 12:32:51,086 - absl - INFO - Using default tokenizer.
+2025-08-08 12:32:51,176 - src.training.trainer - INFO - Composite loss initialized with 2000 BoW indices
+2025-08-08 12:32:51,176 - src.training.trainer - INFO - Trainer initialized with composite loss
+2025-08-08 12:32:51,177 - src.training.trainer - INFO - Loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.1, 'var': 0.05}
+2025-08-08 12:32:51,177 - __main__ - INFO - ============================================================
+2025-08-08 12:32:51,177 - __main__ - INFO - Starting training with composite loss
+2025-08-08 12:32:51,177 - __main__ - INFO - Epochs: 100
+2025-08-08 12:32:51,177 - __main__ - INFO - Batch size: 4
+2025-08-08 12:32:51,178 - __main__ - INFO - Accumulation steps: 8
+2025-08-08 12:32:51,178 - __main__ - INFO - Effective batch size: 32
+2025-08-08 12:32:51,178 - __main__ - INFO - ============================================================
+2025-08-08 12:32:51,179 - src.training.trainer - INFO - ============================================================
+2025-08-08 12:32:51,179 - src.training.trainer - INFO - Starting training with composite loss
+2025-08-08 12:32:51,179 - src.training.trainer - INFO - Initial loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.1, 'var': 0.05}
+2025-08-08 12:32:51,179 - src.training.trainer - INFO - Adaptive scheduling: True
+2025-08-08 12:32:51,179 - src.training.trainer - INFO - ============================================================
+Training Epoch 1:   0%|                                                                                                                                                                | 0/5893 [00:00<?, ?it/s]C:\Users\Marco\anaconda3\Lib\site-packages\torch\nn\functional.py:5560: UserWarning: 1Torch was not compiled with flash attention. (Triggered internally at C:\cb\pytorch_1000000000000\work\aten\src\ATen\native\transformers\cuda\sdp_utils.cpp:555.)
+  attn_output = scaled_dot_product_attention(q, k, v, attn_mask, dropout_p, is_causal)
+2025-08-08 12:32:52,862 - src.training.trainer - WARNING - CUDA error in forward pass: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+2025-08-08 12:32:52,864 - src.training.trainer - ERROR - Error in training step 0: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+Training Epoch 1:   0%|                                                                                                                                                      | 1/5893 [00:02<3:32:18,  2.16s/it]
+2025-08-08 12:32:53,345 - __main__ - ERROR - Training failed with error: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+Traceback (most recent call last):
+  File "C:\Users\Marco\Desktop\Inner Speech Translation\scripts\train.py", line 322, in main
+    best_score = trainer.train()
+                 ^^^^^^^^^^^^^^^
+  File "C:\Users\Marco\Desktop\Inner Speech Translation\scripts\..\src\training\trainer.py", line 576, in train
+    train_loss = self.train_epoch(epoch)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Marco\Desktop\Inner Speech Translation\scripts\..\src\training\trainer.py", line 222, in train_epoch
+    for step, batch in enumerate(pbar):
+  File "C:\Users\Marco\anaconda3\Lib\site-packages\tqdm\std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "C:\Users\Marco\anaconda3\Lib\site-packages\torch\utils\data\dataloader.py", line 630, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Marco\anaconda3\Lib\site-packages\torch\utils\data\dataloader.py", line 675, in _next_data
+    data = _utils.pin_memory.pin_memory(data, self._pin_memory_device)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Marco\anaconda3\Lib\site-packages\torch\utils\data\_utils\pin_memory.py", line 69, in pin_memory
+    clone.update({k: pin_memory(sample, device) for k, sample in data.items()})
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Marco\anaconda3\Lib\site-packages\torch\utils\data\_utils\pin_memory.py", line 89, in pin_memory
+    clone[i] = pin_memory(item, device)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Marco\anaconda3\Lib\site-packages\torch\utils\data\_utils\pin_memory.py", line 59, in pin_memory
+    return data.pin_memory(device)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.

@@ -427,6 +427,15 @@ class EEGDataset(Dataset):
     def _safe_tokenize(self, text):
         """Safe tokenization with comprehensive validation."""
         try:
+            # Clean and validate text
+            if not text or not isinstance(text, str):
+                text = "数据样本"  # Default Chinese text
+            
+            text = text.strip()
+            if not text:
+                text = "数据样本"
+            
+            # Tokenize with special tokens
             encoding = self.tokenizer(
                 text,
                 max_length=self.max_length,
@@ -439,37 +448,40 @@ class EEGDataset(Dataset):
             input_ids = encoding['input_ids'].squeeze(0)
             attention_mask = encoding['attention_mask'].squeeze(0)
             
-            # Validate token IDs
+            # CRITICAL: Validate ALL token IDs are within vocabulary
             max_id = input_ids.max().item()
             min_id = input_ids.min().item()
             
-            if max_id >= self.vocab_size or min_id < 0:
-                logger.error(f"Invalid token IDs: max={max_id}, min={min_id}")
-                return self._create_fallback_tokenization()
+            if max_id >= self.vocab_size:
+                logger.error(f"Token ID {max_id} exceeds vocab size {self.vocab_size}")
+                logger.error(f"Problematic text: {text[:100]}")
+                # Clamp to valid range
+                input_ids = torch.clamp(input_ids, 0, self.vocab_size - 1)
             
-            # Create decoder input IDs
-            decoder_start_token_id = (
-                self.tokenizer.bos_token_id if self.tokenizer.bos_token_id is not None
-                else self.tokenizer.eos_token_id
-            )
+            if min_id < 0:
+                logger.error(f"Negative token ID found: {min_id}")
+                input_ids = torch.clamp(input_ids, 0, self.vocab_size - 1)
             
-            if decoder_start_token_id >= self.vocab_size:
-                decoder_start_token_id = self.tokenizer.eos_token_id
+            # Create decoder input IDs safely
+            # Use CLS token (101) as decoder start if available, else use a safe token
+            decoder_start_token_id = min(101, self.vocab_size - 1)
             
-            decoder_input_ids = shift_tokens_right(
-                input_ids.unsqueeze(0),
-                pad_token_id=self.tokenizer.pad_token_id,
-                decoder_start_token_id=decoder_start_token_id
-            ).squeeze(0)
+            # Shift tokens right for decoder input
+            decoder_input_ids = torch.cat([
+                torch.tensor([decoder_start_token_id]),
+                input_ids[:-1]
+            ])
             
-            # Validate decoder IDs
-            max_decoder_id = decoder_input_ids.max().item()
-            if max_decoder_id >= self.vocab_size:
-                decoder_input_ids[decoder_input_ids >= self.vocab_size] = self.tokenizer.pad_token_id
+            # Ensure decoder input IDs are also valid
+            decoder_input_ids = torch.clamp(decoder_input_ids, 0, self.vocab_size - 1)
             
-            # Create labels
+            # Create labels (input_ids with padding masked)
             labels = input_ids.clone()
             labels[labels == self.tokenizer.pad_token_id] = -100
+            
+            # Final validation
+            assert decoder_input_ids.max() < self.vocab_size, f"Decoder ID overflow: {decoder_input_ids.max()}"
+            assert (labels[labels != -100]).max() < self.vocab_size if (labels != -100).any() else True
             
             return {
                 'decoder_input_ids': decoder_input_ids,
@@ -478,7 +490,7 @@ class EEGDataset(Dataset):
             }
             
         except Exception as e:
-            logger.error(f"Safe tokenization failed: {e}")
+            logger.error(f"Tokenization failed for text: {text[:50]}... Error: {e}")
             return self._create_fallback_tokenization()
 
     def _create_fallback_tokenization(self):

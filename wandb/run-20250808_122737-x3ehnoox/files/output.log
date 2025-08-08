@@ -1,0 +1,488 @@
+2025-08-08 12:27:38,548 - __main__ - INFO - W&B initialized: EEG-Chinese-CompositeLoss
+2025-08-08 12:27:38,549 - __main__ - INFO - Loading tokenizer...
+2025-08-08 12:27:38,819 - __main__ - INFO - Tokenizer loaded. Vocab size: 51271
+2025-08-08 12:27:38,819 - __main__ - INFO - Creating model...
+C:\Users\Marco\anaconda3\Lib\site-packages\torch\nn\modules\transformer.py:307: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+2025-08-08 12:27:41,974 - __main__ - INFO - Custom weights initialized
+2025-08-08 12:27:41,976 - __main__ - INFO - Model created. Total params: 366,039,177, Trainable: 366,039,177
+2025-08-08 12:27:41,976 - __main__ - INFO - Loading dataset...
+2025-08-08 12:27:41,986 - src.data.dataset - INFO - Tokenizer vocabulary size: 51271
+2025-08-08 12:27:41,989 - src.data.dataset - INFO - Frontal region: 16 channels - ['FC5', 'F5', 'F7', 'F3', 'FC1', 'F1', 'AF3', 'Fz', 'FC2', 'F2', 'AF4', 'Fp2', 'F4', 'F6', 'F8', 'FC6']
+2025-08-08 12:27:41,989 - src.data.dataset - INFO - Temporal region: 9 channels - ['T9', 'FT9', 'T7', 'TP7', 'FT8', 'T10', 'FT10', 'T8', 'TP8']
+2025-08-08 12:27:41,989 - src.data.dataset - INFO - Central region: 11 channels - ['C5', 'C3', 'FC3', 'C1', 'CP1', 'Cz', 'CP2', 'C2', 'C4', 'FC4', 'C6']
+2025-08-08 12:27:41,989 - src.data.dataset - INFO - Parietal region: 12 channels - ['P7', 'P5', 'CP3', 'P3', 'PO3', 'PO1', 'PO2', 'P4', 'PO4', 'P6', 'CP4', 'P8']
+2025-08-08 12:27:41,989 - src.data.dataset - INFO - Total channels mapped: 48/125
+2025-08-08 12:27:41,989 - src.data.dataset - INFO - Tokenizer validation passed. Key IDs: pad=0, eos=104, bos=101
+Discovering data files...
+2025-08-08 12:27:41,992 - src.data.dataset - INFO - Found 225 .pkl files
+2025-08-08 12:28:06,698 - src.data.dataset - INFO - Built index for 29466 samples
+Computing normalization parameters from sample...
+2025-08-08 12:28:16,901 - src.data.dataset - INFO - Fitted scaler for frontal with 100 samples
+2025-08-08 12:28:16,920 - src.data.dataset - INFO - Fitted scaler for temporal with 100 samples
+2025-08-08 12:28:16,944 - src.data.dataset - INFO - Fitted scaler for central with 100 samples
+2025-08-08 12:28:16,970 - src.data.dataset - INFO - Fitted scaler for parietal with 100 samples
+Dataset initialized with 29466 samples
+2025-08-08 12:28:17,067 - __main__ - INFO - Dataset loaded: 29466 samples
+2025-08-08 12:28:17,068 - __main__ - INFO - Region channel counts: {'frontal': 16, 'temporal': 9, 'central': 11, 'parietal': 12}
+2025-08-08 12:28:17,072 - __main__ - INFO - Data splits - Train: 23572, Val: 2946, Test: 2948
+2025-08-08 12:28:17,074 - __main__ - INFO - Param group 0: 210,801,736 params, lr=3.00e-04
+2025-08-08 12:28:17,075 - __main__ - INFO - Param group 1: 4,730,112 params, lr=5.00e-04
+2025-08-08 12:28:17,075 - __main__ - INFO - Param group 2: 100,897,601 params, lr=3.00e-05
+2025-08-08 12:28:17,075 - __main__ - INFO - Param group 3: 49,609,728 params, lr=2.50e-04
+C:\Users\Marco\anaconda3\Lib\site-packages\transformers\optimization.py:591: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
+  warnings.warn(
+2025-08-08 12:28:17,077 - __main__ - INFO - Training steps: 73600 total, 500 warmup
+2025-08-08 12:28:17,078 - __main__ - INFO - Optimizer and cosine scheduler created
+2025-08-08 12:28:17,078 - __main__ - INFO - Checkpoints will be saved to: ./checkpoints/
+2025-08-08 12:28:17,079 - absl - INFO - Using default tokenizer.
+2025-08-08 12:28:17,166 - src.training.trainer - INFO - Composite loss initialized with 2000 BoW indices
+2025-08-08 12:28:17,167 - src.training.trainer - INFO - Trainer initialized with composite loss
+2025-08-08 12:28:17,167 - src.training.trainer - INFO - Loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.1, 'var': 0.05}
+2025-08-08 12:28:17,167 - __main__ - INFO - ============================================================
+2025-08-08 12:28:17,167 - __main__ - INFO - Starting training with composite loss
+2025-08-08 12:28:17,168 - __main__ - INFO - Epochs: 100
+2025-08-08 12:28:17,168 - __main__ - INFO - Batch size: 4
+2025-08-08 12:28:17,168 - __main__ - INFO - Accumulation steps: 8
+2025-08-08 12:28:17,168 - __main__ - INFO - Effective batch size: 32
+2025-08-08 12:28:17,168 - __main__ - INFO - ============================================================
+2025-08-08 12:28:17,168 - src.training.trainer - INFO - ============================================================
+2025-08-08 12:28:17,168 - src.training.trainer - INFO - Starting training with composite loss
+2025-08-08 12:28:17,169 - src.training.trainer - INFO - Initial loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.1, 'var': 0.05}
+2025-08-08 12:28:17,169 - src.training.trainer - INFO - Adaptive scheduling: True
+2025-08-08 12:28:17,169 - src.training.trainer - INFO - ============================================================
+Training Epoch 1:   0%|                                                                                                                                                                | 0/5893 [00:00<?, ?it/s]C:\Users\Marco\anaconda3\Lib\site-packages\torch\nn\functional.py:5560: UserWarning: 1Torch was not compiled with flash attention. (Triggered internally at C:\cb\pytorch_1000000000000\work\aten\src\ATen\native\transformers\cuda\sdp_utils.cpp:555.)
+  attn_output = scaled_dot_product_attention(q, k, v, attn_mask, dropout_p, is_causal)
+2025-08-08 12:28:18,681 - src.models.bart_decoder - ERROR - Enhanced BARTDecoder forward pass failed: BartForConditionalGeneration(
+  (model): BartModel(
+    (shared): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+    (encoder): BartEncoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartEncoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (activation_fn): GELUActivation()
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (decoder): BartDecoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartDecoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (activation_fn): GELUActivation()
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (encoder_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (encoder_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+  )
+  (lm_head): Linear(in_features=768, out_features=51271, bias=False)
+) got multiple values for keyword argument 'return_dict'
+2025-08-08 12:28:18,682 - src.training.trainer - ERROR - Error in training step 0: Seq2SeqLMOutput.__init__() got an unexpected keyword argument 'decoder_hidden'
+Training Epoch 1:   0%|                                                                                                                                                      | 1/5893 [00:01<2:28:37,  1.51s/it]2025-08-08 12:28:19,177 - src.models.bart_decoder - ERROR - Enhanced BARTDecoder forward pass failed: BartForConditionalGeneration(
+  (model): BartModel(
+    (shared): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+    (encoder): BartEncoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartEncoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (activation_fn): GELUActivation()
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (decoder): BartDecoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartDecoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (activation_fn): GELUActivation()
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (encoder_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (encoder_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+  )
+  (lm_head): Linear(in_features=768, out_features=51271, bias=False)
+) got multiple values for keyword argument 'return_dict'
+2025-08-08 12:28:19,336 - src.training.trainer - ERROR - Error in training step 1: Seq2SeqLMOutput.__init__() got an unexpected keyword argument 'decoder_hidden'
+Training Epoch 1:   0%|                                                                                                                                                      | 2/5893 [00:02<1:38:49,  1.01s/it]2025-08-08 12:28:19,782 - src.models.bart_decoder - ERROR - Enhanced BARTDecoder forward pass failed: BartForConditionalGeneration(
+  (model): BartModel(
+    (shared): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+    (encoder): BartEncoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartEncoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (activation_fn): GELUActivation()
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (decoder): BartDecoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartDecoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (activation_fn): GELUActivation()
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (encoder_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (encoder_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+  )
+  (lm_head): Linear(in_features=768, out_features=51271, bias=False)
+) got multiple values for keyword argument 'return_dict'
+2025-08-08 12:28:19,951 - src.training.trainer - ERROR - Error in training step 2: Seq2SeqLMOutput.__init__() got an unexpected keyword argument 'decoder_hidden'
+Training Epoch 1:   0%|                                                                                                                                                      | 3/5893 [00:02<1:21:17,  1.21it/s]2025-08-08 12:28:20,412 - src.models.bart_decoder - ERROR - Enhanced BARTDecoder forward pass failed: BartForConditionalGeneration(
+  (model): BartModel(
+    (shared): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+    (encoder): BartEncoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartEncoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (activation_fn): GELUActivation()
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (decoder): BartDecoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartDecoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (activation_fn): GELUActivation()
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (encoder_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (encoder_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+  )
+  (lm_head): Linear(in_features=768, out_features=51271, bias=False)
+) got multiple values for keyword argument 'return_dict'
+2025-08-08 12:28:20,577 - src.training.trainer - ERROR - Error in training step 3: Seq2SeqLMOutput.__init__() got an unexpected keyword argument 'decoder_hidden'
+Training Epoch 1:   0%|                                                                                                                                                      | 4/5893 [00:03<1:13:27,  1.34it/s]2025-08-08 12:28:21,085 - src.models.bart_decoder - ERROR - Enhanced BARTDecoder forward pass failed: BartForConditionalGeneration(
+  (model): BartModel(
+    (shared): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+    (encoder): BartEncoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartEncoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (activation_fn): GELUActivation()
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (decoder): BartDecoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartDecoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (activation_fn): GELUActivation()
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (encoder_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (encoder_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+  )
+  (lm_head): Linear(in_features=768, out_features=51271, bias=False)
+) got multiple values for keyword argument 'return_dict'
+2025-08-08 12:28:21,238 - src.training.trainer - ERROR - Error in training step 4: Seq2SeqLMOutput.__init__() got an unexpected keyword argument 'decoder_hidden'
+Training Epoch 1:   0%|▏                                                                                                                                                     | 5/5893 [00:04<1:10:34,  1.39it/s]2025-08-08 12:28:21,700 - src.models.bart_decoder - ERROR - Enhanced BARTDecoder forward pass failed: BartForConditionalGeneration(
+  (model): BartModel(
+    (shared): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+    (encoder): BartEncoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartEncoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (activation_fn): GELUActivation()
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (decoder): BartDecoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartDecoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (activation_fn): GELUActivation()
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (encoder_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (encoder_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+  )
+  (lm_head): Linear(in_features=768, out_features=51271, bias=False)
+) got multiple values for keyword argument 'return_dict'
+2025-08-08 12:28:21,857 - src.training.trainer - ERROR - Error in training step 5: Seq2SeqLMOutput.__init__() got an unexpected keyword argument 'decoder_hidden'
+Training Epoch 1:   0%|▏                                                                                                                                                     | 6/5893 [00:04<1:07:01,  1.46it/s]2025-08-08 12:28:22,365 - src.models.bart_decoder - ERROR - Enhanced BARTDecoder forward pass failed: BartForConditionalGeneration(
+  (model): BartModel(
+    (shared): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+    (encoder): BartEncoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartEncoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (activation_fn): GELUActivation()
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (decoder): BartDecoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartDecoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (activation_fn): GELUActivation()
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (encoder_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (encoder_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+  )
+  (lm_head): Linear(in_features=768, out_features=51271, bias=False)
+) got multiple values for keyword argument 'return_dict'
+2025-08-08 12:28:22,531 - src.training.trainer - ERROR - Error in training step 6: Seq2SeqLMOutput.__init__() got an unexpected keyword argument 'decoder_hidden'
+Training Epoch 1:   0%|▏                                                                                                                                                     | 7/5893 [00:05<1:06:40,  1.47it/s]2025-08-08 12:28:23,058 - src.models.bart_decoder - ERROR - Enhanced BARTDecoder forward pass failed: BartForConditionalGeneration(
+  (model): BartModel(
+    (shared): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+    (encoder): BartEncoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartEncoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (activation_fn): GELUActivation()
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (decoder): BartDecoder(
+      (embed_tokens): BartScaledWordEmbedding(51271, 768, padding_idx=0)
+      (embed_positions): BartLearnedPositionalEmbedding(1026, 768)
+      (layers): ModuleList(
+        (0-5): 6 x BartDecoderLayer(
+          (self_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (activation_fn): GELUActivation()
+          (self_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (encoder_attn): BartSdpaAttention(
+            (k_proj): Linear(in_features=768, out_features=768, bias=True)
+            (v_proj): Linear(in_features=768, out_features=768, bias=True)
+            (q_proj): Linear(in_features=768, out_features=768, bias=True)
+            (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (encoder_attn_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (fc1): Linear(in_features=768, out_features=3072, bias=True)
+          (fc2): Linear(in_features=3072, out_features=768, bias=True)
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layernorm_embedding): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+  )
+  (lm_head): Linear(in_features=768, out_features=51271, bias=False)
+) got multiple values for keyword argument 'return_dict'
+2025-08-08 12:28:23,221 - src.training.trainer - ERROR - Error in training step 7: Seq2SeqLMOutput.__init__() got an unexpected keyword argument 'decoder_hidden'
+Training Epoch 1:   0%|▏                                                                                                                                                     | 8/5893 [00:06<1:07:01,  1.46it/s]

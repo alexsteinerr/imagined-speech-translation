@@ -1,0 +1,189 @@
+_wandb:
+    value:
+        cli_version: 0.21.0
+        e:
+            1qx3oztgdnoq4djr2ojs7rx9dd582rdm:
+                codePath: scripts\train.py
+                codePathLocal: scripts\train.py
+                cpu_count: 14
+                cpu_count_logical: 20
+                cudaVersion: "12.6"
+                disk:
+                    /:
+                        total: "999322284032"
+                        used: "798790782976"
+                email: steiner.alex40@gmail.com
+                executable: C:\Users\Marco\anaconda3\python.exe
+                git:
+                    commit: 36880d8abe7a5894e784550c0686a302f5cca9a8
+                    remote: https://github.com/AlexSteiner30/Inner-Speech-Translation.git
+                gpu: NVIDIA GeForce RTX 3090
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 10496
+                      memoryTotal: "25769803776"
+                      name: NVIDIA GeForce RTX 3090
+                      uuid: GPU-d2039fc6-5578-397e-08f9-15d05bbcd077
+                host: DESKTOP-TMTD4FG
+                memory:
+                    total: "34183200768"
+                os: Windows-11-10.0.26100-SP0
+                program: C:\Users\Marco\Desktop\Inner Speech Translation\scripts\train.py
+                python: CPython 3.12.4
+                root: C:\Users\Marco\Desktop\Inner Speech Translation
+                startedAt: "2025-08-08T10:32:12.911781Z"
+                writerId: 1qx3oztgdnoq4djr2ojs7rx9dd582rdm
+        m: []
+        python_version: 3.12.4
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 71
+            "2":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 71
+            "3":
+                - 2
+                - 13
+                - 15
+                - 16
+            "4": 3.12.4
+            "5": 0.21.0
+            "6": 4.46.2
+            "8":
+                - 3
+            "12": 0.21.0
+            "13": windows-amd64
+accumulation_steps:
+    value: 8
+adaptation_patience:
+    value: 5
+adaptation_rate:
+    value: 0.01
+augmentation:
+    value:
+        enabled: true
+        noise_std: 0.01
+        scale_range:
+            - 0.95
+            - 1.05
+        time_shift: 2
+bart_decoder_lr:
+    value: 3e-05
+batch_size:
+    value: 4
+bow_vocab_size:
+    value: 2000
+brain_encoder_lr:
+    value: 0.0003
+cnn_only:
+    value: false
+contrastive_tau:
+    value: 0.07
+data_dir:
+    value: data/eeg_data/
+deterministic:
+    value: true
+disable_cross_region_attn:
+    value: false
+epochs:
+    value: 100
+eval_interval:
+    value: 1
+experiment_name:
+    value: EEG-Chinese-CompositeLoss
+generation:
+    value:
+        eval:
+            diversity_penalty: 0.5
+            early_stopping: true
+            length_penalty: 1
+            max_length: 18
+            min_length: 4
+            no_repeat_ngram_size: 3
+            num_beam_groups: 2
+            num_beams: 5
+            repetition_penalty: 1.3
+        train:
+            do_sample: true
+            max_length: 18
+            min_length: 4
+            no_repeat_ngram_size: 2
+            repetition_penalty: 1.2
+            temperature: 0.8
+            top_k: 50
+            top_p: 0.9
+grad_clip_norm:
+    value: 1
+hidden_dim:
+    value: 768
+label_smoothing:
+    value: 0.05
+log_interval:
+    value: 20
+loss_weights:
+    value:
+        align: 0.5
+        bow: 0.15
+        ce: 1
+        div: 0.1
+        var: 0.05
+max_diversity_score:
+    value: 0.8
+max_gradient_norm:
+    value: 1
+max_length:
+    value: 16
+min_diversity_score:
+    value: 0.3
+mixed_precision:
+    value: false
+monitor_metrics:
+    value:
+        early_stopping: val_bleu_4
+        mode: max
+        primary: val_bleu_4
+        secondary: val_diversity_score
+montage_file:
+    value: data/montage.csv
+n_timepoints:
+    value: 1651
+num_workers:
+    value: 0
+patience:
+    value: 15
+pretrained_model:
+    value: fnlp/bart-base-chinese
+projection_lr:
+    value: 0.0005
+save_dir:
+    value: ./checkpoints/
+save_interval:
+    value: 5
+seed:
+    value: 42
+test_split:
+    value: 0.1
+train_split:
+    value: 0.8
+uniform_region_weight:
+    value: false
+use_adaptive_loss:
+    value: true
+val_split:
+    value: 0.1
+warmup_steps:
+    value: 500
+weight_decay:
+    value: 0.01

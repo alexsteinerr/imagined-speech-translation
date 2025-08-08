@@ -174,6 +174,15 @@ class BARTDecoder(nn.Module):
     def forward(self, eeg_feat, decoder_input_ids=None, labels=None, **kwargs):
         """
         Enhanced forward pass with hidden state output.
+        
+        Args:
+            eeg_feat: EEG features of shape (batch_size, hidden_dim)
+            decoder_input_ids: Decoder input token IDs
+            labels: Target token IDs for training
+            **kwargs: Additional arguments for BART
+        
+        Returns:
+            Enhanced BART model outputs with decoder hidden states
         """
         try:
             batch_size = eeg_feat.shape[0]
@@ -195,17 +204,23 @@ class BARTDecoder(nn.Module):
                 attentions=attention_weights
             )
             
-            # IMPORTANT: Enable output_hidden_states
+            # Remove conflicting arguments from kwargs
+            bart_kwargs = kwargs.copy()
+            bart_kwargs.pop('return_dict', None)  # Remove if exists
+            bart_kwargs.pop('output_hidden_states', None)  # Remove if exists
+            bart_kwargs.pop('use_cache', None)  # Remove if exists
+            
+            # Run BART with EEG-conditioned encoder
             bart_outputs = self.bart(
                 input_ids=None,
                 attention_mask=encoder_attention_mask,
                 encoder_outputs=encoder_outputs,
                 decoder_input_ids=decoder_input_ids,
                 labels=labels,
-                output_hidden_states=True,  # <-- ADD THIS
-                return_dict=True,
-                use_cache=False,  # <-- Disable cache during training
-                **kwargs
+                output_hidden_states=True,  # Always output hidden states
+                return_dict=True,  # Always return dict
+                use_cache=False,  # Disable cache during training
+                **bart_kwargs  # Pass remaining kwargs
             )
             
             # Extract decoder hidden states if available
@@ -227,7 +242,12 @@ class BARTDecoder(nn.Module):
             
             dummy_logits = torch.zeros(batch_size, seq_len, vocab_size, device=eeg_feat.device)
             dummy_loss = torch.tensor(5.0, device=eeg_feat.device, requires_grad=True)
-            return Seq2SeqLMOutput(loss=dummy_loss, logits=dummy_logits, decoder_hidden=None)
+            
+            # Create a proper output object
+            from transformers.modeling_outputs import Seq2SeqLMOutput
+            output = Seq2SeqLMOutput(loss=dummy_loss, logits=dummy_logits)
+            output.decoder_hidden = None
+            return output
         
         
     def generate_from_eeg(self, eeg_feat, max_length=32, **kwargs):

@@ -1,0 +1,212 @@
+_wandb:
+    value:
+        cli_version: 0.21.0
+        e:
+            2qzwhhxjcaow9g6ywc61sjk1gqw640kz:
+                codePath: scripts\train.py
+                codePathLocal: scripts\train.py
+                cpu_count: 14
+                cpu_count_logical: 20
+                cudaVersion: "12.6"
+                disk:
+                    /:
+                        total: "999322284032"
+                        used: "796465647616"
+                email: steiner.alex40@gmail.com
+                executable: C:\Users\Marco\anaconda3\python.exe
+                git:
+                    commit: 5edac18817cfbadddee23bb5dba00e12ce027478
+                    remote: https://github.com/AlexSteiner30/Inner-Speech-Translation.git
+                gpu: NVIDIA GeForce RTX 3090
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 10496
+                      memoryTotal: "25769803776"
+                      name: NVIDIA GeForce RTX 3090
+                      uuid: GPU-d2039fc6-5578-397e-08f9-15d05bbcd077
+                host: DESKTOP-TMTD4FG
+                memory:
+                    total: "34183200768"
+                os: Windows-11-10.0.26100-SP0
+                program: C:\Users\Marco\Desktop\Inner Speech Translation\scripts\train.py
+                python: CPython 3.12.4
+                root: C:\Users\Marco\Desktop\Inner Speech Translation
+                startedAt: "2025-08-06T22:06:20.512428Z"
+                writerId: 2qzwhhxjcaow9g6ywc61sjk1gqw640kz
+        m: []
+        python_version: 3.12.4
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 71
+            "2":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 71
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.4
+            "5": 0.21.0
+            "6": 4.46.2
+            "8":
+                - 3
+            "12": 0.21.0
+            "13": windows-amd64
+accumulation_steps:
+    value: 8
+attention_dropout:
+    value: 0.05
+augment_prob:
+    value: 0.1
+bart_decoder_lr:
+    value: 5e-05
+bart_encoder_lr:
+    value: 1e-05
+batch_size:
+    value: 4
+benchmark:
+    value: false
+brain_encoder_lr:
+    value: 0.0005
+classifier_dropout:
+    value: 0.1
+cnn_only:
+    value: false
+data_augmentation:
+    value: true
+data_dir:
+    value: data/eeg_data/
+dataloader_num_workers:
+    value: 0
+deterministic:
+    value: true
+disable_cross_modal:
+    value: false
+disable_cross_region_attn:
+    value: false
+do_sample:
+    value: false
+dropout_rate:
+    value: 0.08
+early_stopping_metric:
+    value: bleu_4
+early_stopping_mode:
+    value: max
+eeg_conditioning_clamp_max:
+    value: 1.2
+eeg_conditioning_clamp_min:
+    value: 0.3
+eeg_conditioning_strength_init:
+    value: 0.7
+eeg_projection_layers:
+    value: 3
+encoder_sequence_length:
+    value: 24
+epochs:
+    value: 100
+eval_interval:
+    value: 1
+experiment_name:
+    value: EEG-Chinese-Fixed
+find_unused_parameters:
+    value: true
+freeze_bart_embeddings:
+    value: false
+freeze_bart_encoder:
+    value: false
+grad_clip_norm:
+    value: 1
+hidden_dim:
+    value: 768
+label_smoothing:
+    value: 0.01
+length_penalty:
+    value: 0.8
+log_every_n_steps:
+    value: 10
+log_interval:
+    value: 25
+log_predictions:
+    value: true
+max_gen_length:
+    value: 18
+max_length:
+    value: 16
+max_prediction_examples:
+    value: 8
+min_length:
+    value: 4
+monitor_metric:
+    value: val_bleu_4
+montage_file:
+    value: data/montage.csv
+n_timepoints:
+    value: 1651
+no_repeat_ngram_size:
+    value: 2
+noise_std_ratio:
+    value: 0.008
+num_beams:
+    value: 3
+patience:
+    value: 20
+persistent_workers:
+    value: false
+pin_memory:
+    value: true
+pretrained_model:
+    value: fnlp/bart-base-chinese
+projection_lr:
+    value: 0.001
+region_attention_heads:
+    value: 8
+region_fusion_layers:
+    value: 1
+save_dir:
+    value: ./checkpoints/
+save_every_n_epochs:
+    value: 3
+save_top_k:
+    value: 3
+scale_range:
+    value:
+        - 0.99
+        - 1.01
+seed:
+    value: 42
+temperature:
+    value: 0.7
+test_split:
+    value: 0.1
+top_k:
+    value: 40
+top_p:
+    value: 0.85
+train_split:
+    value: 0.8
+uniform_region_weight:
+    value: false
+use_amp:
+    value: false
+val_check_interval:
+    value: 0.5
+val_max_samples:
+    value: 2000
+val_split:
+    value: 0.1
+warmup_steps:
+    value: 1000
+weight_decay:
+    value: 0.01

@@ -1,0 +1,19 @@
+INFO:__main__:Using device: cuda
+INFO:src.data.dataset:Tokenizer vocabulary size: 51271
+INFO:src.data.dataset:Frontal region: 16 channels - ['FC5', 'F5', 'F7', 'F3', 'FC1', 'F1', 'AF3', 'Fz', 'FC2', 'F2', 'AF4', 'Fp2', 'F4', 'F6', 'F8', 'FC6']
+INFO:src.data.dataset:Temporal region: 9 channels - ['T9', 'FT9', 'T7', 'TP7', 'FT8', 'T10', 'FT10', 'T8', 'TP8']
+INFO:src.data.dataset:Central region: 11 channels - ['C5', 'C3', 'FC3', 'C1', 'CP1', 'Cz', 'CP2', 'C2', 'C4', 'FC4', 'C6']
+INFO:src.data.dataset:Parietal region: 12 channels - ['P7', 'P5', 'CP3', 'P3', 'PO3', 'PO1', 'PO2', 'P4', 'PO4', 'P6', 'CP4', 'P8']
+INFO:src.data.dataset:Total channels mapped: 48/125
+INFO:src.data.dataset:Tokenizer validation passed. Key IDs: pad=0, eos=104, bos=101
+Loading and preprocessing entire dataset...
+INFO:src.data.dataset:Found 225 valid data files out of 225 total
+INFO:src.data.dataset:First pass: collecting all EEG data for normalization...
+INFO:src.data.dataset:Collected 29466 valid samples for preprocessing
+INFO:src.data.dataset:Computing normalization parameters for each region...
+INFO:src.data.dataset:Fitted scaler for frontal region with (48648366, 16)
+INFO:src.data.dataset:Fitted scaler for temporal region with (48648366, 9)
+INFO:src.data.dataset:Fitted scaler for central region with (48648366, 11)
+INFO:src.data.dataset:Fitted scaler for parietal region with (48648366, 12)
+INFO:src.data.dataset:Normalizing and augmenting all samples...
+INFO:src.data.dataset:Successfully preprocessed 29466 samples

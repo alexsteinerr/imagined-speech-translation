@@ -1,0 +1,28 @@
+2025-08-07 00:01:34,153 INFO    MainThread:15284 [wandb_setup.py:_flush():80] Current SDK version is 0.21.0
+2025-08-07 00:01:34,153 INFO    MainThread:15284 [wandb_setup.py:_flush():80] Configure stats pid to 15284
+2025-08-07 00:01:34,153 INFO    MainThread:15284 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Marco\.config\wandb\settings
+2025-08-07 00:01:34,153 INFO    MainThread:15284 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Marco\Desktop\Inner Speech Translation\wandb\settings
+2025-08-07 00:01:34,153 INFO    MainThread:15284 [wandb_setup.py:_flush():80] Loading settings from environment variables
+2025-08-07 00:01:34,154 INFO    MainThread:15284 [wandb_init.py:setup_run_log_directory():703] Logging user logs to C:\Users\Marco\Desktop\Inner Speech Translation\wandb\run-20250807_000134-t0cesodd\logs\debug.log
+2025-08-07 00:01:34,154 INFO    MainThread:15284 [wandb_init.py:setup_run_log_directory():704] Logging internal logs to C:\Users\Marco\Desktop\Inner Speech Translation\wandb\run-20250807_000134-t0cesodd\logs\debug-internal.log
+2025-08-07 00:01:34,154 INFO    MainThread:15284 [wandb_init.py:init():830] calling init triggers
+2025-08-07 00:01:34,154 INFO    MainThread:15284 [wandb_init.py:init():835] wandb.init called with sweep_config: {}
+config: {'data_dir': 'data/eeg_data/', 'montage_file': 'data/montage.csv', 'save_dir': './checkpoints/', 'pretrained_model': 'fnlp/bart-base-chinese', 'hidden_dim': 768, 'n_timepoints': 1651, 'max_length': 16, 'disable_cross_region_attn': False, 'uniform_region_weight': False, 'cnn_only': False, 'disable_cross_modal': False, 'epochs': 100, 'batch_size': 4, 'accumulation_steps': 8, 'patience': 20, 'grad_clip_norm': 1.0, 'brain_encoder_lr': 0.0005, 'bart_decoder_lr': 5e-05, 'bart_encoder_lr': 1e-05, 'projection_lr': 0.001, 'warmup_steps': 1000, 'weight_decay': 0.01, 'label_smoothing': 0.01, 'num_beams': 3, 'max_gen_length': 18, 'no_repeat_ngram_size': 2, 'length_penalty': 0.8, 'min_length': 4, 'do_sample': False, 'temperature': 0.7, 'top_k': 40, 'top_p': 0.85, 'train_split': 0.8, 'val_split': 0.1, 'val_max_samples': 2000, 'experiment_name': 'EEG-Chinese-Fixed', 'log_interval': 25, 'eval_interval': 1, 'save_every_n_epochs': 3, 'use_amp': False, 'find_unused_parameters': True, 'dataloader_num_workers': 0, 'pin_memory': True, 'persistent_workers': False, 'dropout_rate': 0.08, 'attention_dropout': 0.05, 'classifier_dropout': 0.1, 'data_augmentation': True, 'augment_prob': 0.1, 'noise_std_ratio': 0.008, 'scale_range': (0.99, 1.01), 'val_check_interval': 0.5, 'test_split': 0.1, 'early_stopping_metric': 'bleu_4', 'early_stopping_mode': 'max', 'log_every_n_steps': 10, 'save_top_k': 3, 'monitor_metric': 'val_bleu_4', 'log_predictions': True, 'max_prediction_examples': 8, 'freeze_bart_encoder': False, 'freeze_bart_embeddings': False, 'region_attention_heads': 8, 'region_fusion_layers': 1, 'eeg_conditioning_strength_init': 0.7, 'eeg_conditioning_clamp_min': 0.3, 'eeg_conditioning_clamp_max': 1.2, 'encoder_sequence_length': 24, 'eeg_projection_layers': 3, 'seed': 42, 'deterministic': True, 'benchmark': False, '_wandb': {}}
+2025-08-07 00:01:34,154 INFO    MainThread:15284 [wandb_init.py:init():871] starting backend
+2025-08-07 00:01:34,369 INFO    MainThread:15284 [wandb_init.py:init():874] sending inform_init request
+2025-08-07 00:01:34,392 INFO    MainThread:15284 [wandb_init.py:init():882] backend started and connected
+2025-08-07 00:01:34,393 INFO    MainThread:15284 [wandb_init.py:init():953] updated telemetry
+2025-08-07 00:01:34,421 INFO    MainThread:15284 [wandb_init.py:init():977] communicating run to backend with 90.0 second timeout
+2025-08-07 00:01:34,921 INFO    MainThread:15284 [wandb_init.py:init():1029] starting run threads in backend
+2025-08-07 00:01:35,332 INFO    MainThread:15284 [wandb_run.py:_console_start():2458] atexit reg
+2025-08-07 00:01:35,332 INFO    MainThread:15284 [wandb_run.py:_redirect():2306] redirect: wrap_raw
+2025-08-07 00:01:35,332 INFO    MainThread:15284 [wandb_run.py:_redirect():2375] Wrapping output streams.
+2025-08-07 00:01:35,332 INFO    MainThread:15284 [wandb_run.py:_redirect():2398] Redirects installed.
+2025-08-07 00:01:35,335 INFO    MainThread:15284 [wandb_init.py:init():1075] run started, returning control to user process
+2025-08-07 00:05:00,089 INFO    MainThread:15284 [wandb_run.py:_finish():2224] finishing run steiner-alex-h-farm/EEG-Chinese/t0cesodd
+2025-08-07 00:05:00,089 INFO    MainThread:15284 [wandb_run.py:_atexit_cleanup():2423] got exitcode: 0
+2025-08-07 00:05:00,089 INFO    MainThread:15284 [wandb_run.py:_restore():2405] restore
+2025-08-07 00:05:00,089 INFO    MainThread:15284 [wandb_run.py:_restore():2411] restore done
+2025-08-07 00:05:01,005 INFO    MainThread:15284 [wandb_run.py:_footer_history_summary_info():3903] rendering history
+2025-08-07 00:05:01,005 INFO    MainThread:15284 [wandb_run.py:_footer_history_summary_info():3935] rendering summary
+2025-08-07 00:05:01,005 INFO    MainThread:15284 [wandb_run.py:_footer_sync_info():3864] logging synced files

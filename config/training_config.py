@@ -226,3 +226,12 @@ def update_loss_weights(current_weights, action, rate=None):
         weights['var'] = max(0.02, weights['var'] * (1 - rate))
         
     return weights
+
+def validate_config():
+    """Validate configuration consistency."""
+    assert CONFIG['train_split'] + CONFIG['val_split'] + CONFIG['test_split'] == 1.0
+    assert CONFIG['batch_size'] > 0
+    assert CONFIG['accumulation_steps'] > 0
+    assert all(w > 0 for w in CONFIG['loss_weights'].values())
+    assert CONFIG['min_diversity_score'] < CONFIG['max_diversity_score']
+    return True

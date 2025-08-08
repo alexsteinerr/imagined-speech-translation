@@ -126,26 +126,49 @@ class EEGTrainer:
             Model outputs with loss and components
         """
         try:
-            # Validate inputs
+            # Validate inputs thoroughly
             vocab_size = len(self.tokenizer.get_vocab())
-            if decoder_input_ids.max() >= vocab_size or (labels != -100).any() and labels[labels != -100].max() >= vocab_size:
-                logger.warning("Invalid token IDs detected, skipping batch")
-                return None
+            
+            # Check decoder input IDs
+            if decoder_input_ids.numel() > 0:
+                max_decoder_id = decoder_input_ids.max().item()
+                if max_decoder_id >= vocab_size:
+                    logger.error(f"Invalid decoder token ID: {max_decoder_id} >= {vocab_size}")
+                    # Try to recover by clamping
+                    decoder_input_ids = torch.clamp(decoder_input_ids, 0, vocab_size - 1)
+            
+            # Check labels
+            if labels.numel() > 0:
+                valid_labels = labels[labels != -100]
+                if valid_labels.numel() > 0:
+                    max_label_id = valid_labels.max().item()
+                    if max_label_id >= vocab_size:
+                        logger.error(f"Invalid label token ID: {max_label_id} >= {vocab_size}")
+                        # Try to recover by clamping
+                        labels = torch.where(
+                            labels == -100,
+                            labels,
+                            torch.clamp(labels, 0, vocab_size - 1)
+                        )
             
             # Get EEG features
             eeg_features = self.model.brain_encoder(eeg)
             
-            # Forward through decoder (should return decoder_hidden if properly modified)
+            # Forward through decoder WITHOUT passing labels (we compute loss separately)
+            # This avoids the internal loss computation of BART
             outputs = self.model.bart_decoder(
                 eeg_feat=eeg_features,
                 decoder_input_ids=decoder_input_ids,
-                labels=None,  # We'll compute loss separately
-                return_dict=True
+                labels=None  # Don't pass labels to avoid internal loss computation
             )
             
             # Extract components
             logits = outputs.logits if hasattr(outputs, 'logits') else outputs.get('logits')
             decoder_hidden = outputs.decoder_hidden if hasattr(outputs, 'decoder_hidden') else None
+            
+            if logits is None:
+                logger.error("No logits in model output")
+                return None
             
             # Create attention mask
             attention_mask = (decoder_input_ids != self.tokenizer.pad_token_id).float()
@@ -163,7 +186,7 @@ class EEGTrainer:
             # Package outputs
             outputs.loss = loss_dict['loss']
             outputs.loss_components = {k: v.item() if torch.is_tensor(v) else v 
-                                      for k, v in loss_dict.items() if k != 'loss'}
+                                    for k, v in loss_dict.items() if k != 'loss'}
             outputs.eeg_features = eeg_features
             
             return outputs
@@ -174,7 +197,13 @@ class EEGTrainer:
                 torch.cuda.empty_cache()
                 return None
             else:
+                logger.error(f"Runtime error in forward pass: {e}")
                 raise e
+        except Exception as e:
+            logger.error(f"Unexpected error in forward pass: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
 
     def train_epoch(self, epoch):
         """

@@ -1,0 +1,13 @@
+{"time":"2025-08-07T00:34:13.1017482+02:00","level":"INFO","msg":"stream: starting","core version":"0.21.0"}
+{"time":"2025-08-07T00:34:13.4036436+02:00","level":"INFO","msg":"stream: created new stream","id":"j0clh6t4"}
+{"time":"2025-08-07T00:34:13.4036436+02:00","level":"INFO","msg":"stream: started","id":"j0clh6t4"}
+{"time":"2025-08-07T00:34:13.4036436+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"j0clh6t4"}
+{"time":"2025-08-07T00:34:13.4036436+02:00","level":"INFO","msg":"sender: started","stream_id":"j0clh6t4"}
+{"time":"2025-08-07T00:34:13.4036436+02:00","level":"INFO","msg":"handler: started","stream_id":"j0clh6t4"}
+{"time":"2025-08-07T06:02:34.2533676+02:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading artifact run-j0clh6t4-predictions_table_epoch_2","runtime_seconds":1.023084,"subtasks":[{"desc":"predictions_table_epoch_2.table.json","runtime_seconds":0.1844886,"progress":"1.8KB/1.8KB"}]},{"desc":"uploading media\\table\\predictions_table_epoch_2_731_600edbe1bb7ac543a772.table.json","runtime_seconds":0.8229807,"progress":"994B/994B"},{"desc":"uploading output.log","runtime_seconds":0.8229807,"progress":"1.3MB/1.3MB"}],"total_operations":3}}
+{"time":"2025-08-07T06:02:35.1074553+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-08-07T06:02:35.3655271+02:00","level":"INFO","msg":"stream: closing","id":"j0clh6t4"}
+{"time":"2025-08-07T06:02:35.3655271+02:00","level":"INFO","msg":"sender: closed","stream_id":"j0clh6t4"}
+{"time":"2025-08-07T06:02:35.3655271+02:00","level":"INFO","msg":"handler: closed","stream_id":"j0clh6t4"}
+{"time":"2025-08-07T06:02:35.3655271+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"j0clh6t4"}
+{"time":"2025-08-07T06:02:35.3655271+02:00","level":"INFO","msg":"stream: closed","id":"j0clh6t4"}
