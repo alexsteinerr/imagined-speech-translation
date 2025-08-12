@@ -1,0 +1,113 @@
+2025-08-09 23:10:08,347 - __main__ - INFO - W&B initialized: EEG-Chinese-CompositeLoss
+2025-08-09 23:10:08,348 - __main__ - INFO - Loading tokenizer...
+2025-08-09 23:10:08,733 - __main__ - INFO - Tokenizer loaded. Vocab size: 51271
+2025-08-09 23:10:08,733 - __main__ - INFO - Creating model...
+C:\Users\Marco\anaconda3\Lib\site-packages\torch\nn\modules\transformer.py:307: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+2025-08-09 23:10:11,332 - __main__ - INFO - Custom weights initialized
+2025-08-09 23:10:11,335 - __main__ - INFO - Model created. Total params: 366,039,177, Trainable: 366,039,177
+2025-08-09 23:10:11,336 - __main__ - INFO - Loading dataset...
+2025-08-09 23:10:11,346 - src.data.dataset - INFO - Tokenizer vocabulary size: 51271
+2025-08-09 23:10:11,353 - src.data.dataset - INFO - Frontal region: 16 channels - ['FC5', 'F5', 'F7', 'F3', 'FC1', 'F1', 'AF3', 'Fz', 'FC2', 'F2', 'AF4', 'Fp2', 'F4', 'F6', 'F8', 'FC6']
+2025-08-09 23:10:11,353 - src.data.dataset - INFO - Temporal region: 9 channels - ['T9', 'FT9', 'T7', 'TP7', 'FT8', 'T10', 'FT10', 'T8', 'TP8']
+2025-08-09 23:10:11,354 - src.data.dataset - INFO - Central region: 11 channels - ['C5', 'C3', 'FC3', 'C1', 'CP1', 'Cz', 'CP2', 'C2', 'C4', 'FC4', 'C6']
+2025-08-09 23:10:11,354 - src.data.dataset - INFO - Parietal region: 12 channels - ['P7', 'P5', 'CP3', 'P3', 'PO3', 'PO1', 'PO2', 'P4', 'PO4', 'P6', 'CP4', 'P8']
+2025-08-09 23:10:11,354 - src.data.dataset - INFO - Total channels mapped: 48/125
+2025-08-09 23:10:11,354 - src.data.dataset - INFO - Tokenizer validation passed. Key IDs: pad=0, eos=104, bos=101
+Discovering data files...
+2025-08-09 23:10:11,355 - src.data.dataset - INFO - Found 225 .pkl files
+2025-08-09 23:10:34,899 - src.data.dataset - INFO - Built index for 29466 samples
+Computing normalization parameters from sample...
+2025-08-09 23:10:45,167 - src.data.dataset - INFO - Fitted scaler for frontal with 100 samples
+2025-08-09 23:10:45,188 - src.data.dataset - INFO - Fitted scaler for temporal with 100 samples
+2025-08-09 23:10:45,214 - src.data.dataset - INFO - Fitted scaler for central with 100 samples
+2025-08-09 23:10:45,245 - src.data.dataset - INFO - Fitted scaler for parietal with 100 samples
+Dataset initialized with 29466 samples
+2025-08-09 23:10:45,366 - __main__ - INFO - Dataset loaded: 29466 samples
+2025-08-09 23:10:45,366 - __main__ - INFO - Region channel counts: {'frontal': 16, 'temporal': 9, 'central': 11, 'parietal': 12}
+2025-08-09 23:10:45,370 - __main__ - INFO - Data splits - Train: 23572, Val: 2946, Test: 2948
+2025-08-09 23:10:45,371 - __main__ - INFO - DataLoader settings - pin_memory: False, num_workers: 0
+2025-08-09 23:10:45,373 - __main__ - INFO - Param group 0: 210,801,736 params, lr=3.00e-04
+2025-08-09 23:10:45,373 - __main__ - INFO - Param group 1: 4,730,112 params, lr=5.00e-04
+2025-08-09 23:10:45,373 - __main__ - INFO - Param group 2: 100,897,601 params, lr=3.00e-05
+2025-08-09 23:10:45,373 - __main__ - INFO - Param group 3: 49,609,728 params, lr=2.50e-04
+C:\Users\Marco\anaconda3\Lib\site-packages\transformers\optimization.py:591: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
+  warnings.warn(
+2025-08-09 23:10:45,376 - __main__ - INFO - Training steps: 73600 total, 500 warmup
+2025-08-09 23:10:45,376 - __main__ - INFO - Optimizer and cosine scheduler created
+2025-08-09 23:10:45,377 - __main__ - INFO - Checkpoints will be saved to: ./checkpoints/
+2025-08-09 23:10:45,378 - absl - INFO - Using default tokenizer.
+2025-08-09 23:10:45,406 - src.training.losses - INFO - Selected 2000 BoW indices from vocabulary of size 51271
+2025-08-09 23:10:45,481 - src.training.trainer - INFO - Composite loss initialized with 2000 BoW indices
+2025-08-09 23:10:45,481 - src.training.trainer - INFO - Trainer initialized with composite loss
+2025-08-09 23:10:45,481 - src.training.trainer - INFO - Loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.1, 'var': 0.05}
+2025-08-09 23:10:45,482 - __main__ - INFO - ============================================================
+2025-08-09 23:10:45,482 - __main__ - INFO - Starting training with composite loss
+2025-08-09 23:10:45,482 - __main__ - INFO - Epochs: 100
+2025-08-09 23:10:45,482 - __main__ - INFO - Batch size: 4
+2025-08-09 23:10:45,483 - __main__ - INFO - Accumulation steps: 8
+2025-08-09 23:10:45,483 - __main__ - INFO - Effective batch size: 32
+2025-08-09 23:10:45,483 - __main__ - INFO - ============================================================
+2025-08-09 23:10:45,483 - src.training.trainer - INFO - ============================================================
+2025-08-09 23:10:45,483 - src.training.trainer - INFO - Starting training with composite loss
+2025-08-09 23:10:45,483 - src.training.trainer - INFO - Initial loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.1, 'var': 0.05}
+2025-08-09 23:10:45,484 - src.training.trainer - INFO - Adaptive scheduling: True
+2025-08-09 23:10:45,484 - src.training.trainer - INFO - ============================================================
+Training Epoch 1:   0%|                                                                                                                                                                | 0/5893 [00:00<?, ?it/s]C:\Users\Marco\anaconda3\Lib\site-packages\torch\nn\functional.py:5560: UserWarning: 1Torch was not compiled with flash attention. (Triggered internally at C:\cb\pytorch_1000000000000\work\aten\src\ATen\native\transformers\cuda\sdp_utils.cpp:555.)
+  attn_output = scaled_dot_product_attention(q, k, v, attn_mask, dropout_p, is_causal)
+Training Epoch 1: 100%|████████████████████████████████████████████████████████████████████| 5893/5893 [2:39:26<00:00,  1.62s/it, loss=3.7095, lr=3.0e-04, ce=3.232, ali=0.533, bow=1.021, div=0.558, var=0.051]
+2025-08-10 01:50:12,350 - src.training.trainer - INFO - Epoch 1 - Avg Loss: 4.8747
+2025-08-10 01:50:12,351 - src.training.trainer - INFO - Loss components: {'loss_ce': 4.1031791521781535, 'loss_align': 1.1292843430258945, 'loss_bow': 0.7537132439347534, 'loss_div': 0.775636005668128, 'loss_var': 0.3251215271608205}
+Building prefix dict from the default dictionary ...                                                                                                                                                            
+2025-08-10 02:09:55,436 - jieba - DEBUG - Building prefix dict from the default dictionary ...
+Loading model from cache C:\Users\Marco\AppData\Local\Temp\jieba.cache
+2025-08-10 02:09:55,437 - jieba - DEBUG - Loading model from cache C:\Users\Marco\AppData\Local\Temp\jieba.cache
+Loading model cost 0.425 seconds.
+2025-08-10 02:09:55,862 - jieba - DEBUG - Loading model cost 0.425 seconds.
+Prefix dict has been built successfully.
+2025-08-10 02:09:55,863 - jieba - DEBUG - Prefix dict has been built successfully.
+2025-08-10 02:09:57,789 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 3.9166
+Training Epoch 2: 100%|████████████████████████████████████████████████████████████████████| 5893/5893 [2:37:46<00:00,  1.61s/it, loss=2.7849, lr=3.0e-04, ce=2.335, ali=0.452, bow=0.982, div=0.751, var=0.028]
+2025-08-10 04:47:44,081 - src.training.trainer - INFO - Epoch 2 - Avg Loss: 3.1852
+2025-08-10 04:47:44,081 - src.training.trainer - INFO - Loss components: {'loss_ce': 2.7410586118981324, 'loss_align': 0.4669029859273781, 'loss_bow': 1.0629134128297222, 'loss_div': 0.5005586695336293, 'loss_var': 0.024798600693061366}
+2025-08-10 05:07:29,170 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 3.2899                                                                                              
+Training Epoch 3: 100%|████████████████████████████████████████████████████████████████████| 5893/5893 [2:37:18<00:00,  1.60s/it, loss=2.6942, lr=3.0e-04, ce=2.469, ali=0.021, bow=1.239, div=0.289, var=0.006]
+2025-08-10 07:44:47,852 - src.training.trainer - INFO - Epoch 3 - Avg Loss: 2.6510
+2025-08-10 07:44:47,853 - src.training.trainer - INFO - Loss components: {'loss_ce': 2.239197606508788, 'loss_align': 0.3813034369520049, 'loss_bow': 1.1680987845874289, 'loss_div': 0.45263181242446393, 'loss_var': 0.013181567005942516}
+2025-08-10 08:04:15,969 - src.training.trainer - INFO - Updated loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.101, 'var': 0.0505}                                                               
+2025-08-10 08:04:16,205 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 2.9983
+Training Epoch 4: 100%|████████████████████████████████████████████████████████████████████| 5893/5893 [2:37:08<00:00,  1.60s/it, loss=2.3855, lr=3.0e-04, ce=2.058, ali=0.223, bow=1.213, div=0.333, var=0.003]
+2025-08-10 10:41:24,943 - src.training.trainer - INFO - Epoch 4 - Avg Loss: 2.3769
+2025-08-10 10:41:24,944 - src.training.trainer - INFO - Loss components: {'loss_ce': 2.028055998600543, 'loss_align': 0.2622499965709626, 'loss_bow': 1.1622461876864347, 'loss_div': 0.42266336681051647, 'loss_var': 0.012783120483120983}
+2025-08-10 11:00:36,362 - src.training.trainer - INFO - Updated loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.10201, 'var': 0.051005}                                                           
+2025-08-10 11:00:36,610 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 2.8636
+Training Epoch 5: 100%|████████████████████████████████████████████████████████████████████| 5893/5893 [2:36:40<00:00,  1.60s/it, loss=2.0141, lr=3.0e-04, ce=1.647, ali=0.340, bow=0.929, div=0.545, var=0.035]
+2025-08-10 13:37:17,314 - src.training.trainer - INFO - Epoch 5 - Avg Loss: 2.1953
+2025-08-10 13:37:17,315 - src.training.trainer - INFO - Loss components: {'loss_ce': 1.913889028980314, 'loss_align': 0.17122458695538953, 'loss_bow': 1.0626635020037731, 'loss_div': 0.34984320650076633, 'loss_var': 0.013348126359672384}
+2025-08-10 13:57:58,741 - src.training.trainer - INFO - Updated loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.1030301, 'var': 0.05151505}                                                       
+2025-08-10 13:57:59,033 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 2.8056
+2025-08-10 13:57:59,033 - src.training.trainer - WARNING - Model stuck in repetitive generation for 5 evaluations
+2025-08-10 13:57:59,034 - src.training.trainer - WARNING - Consider adjusting loss weights or learning rates
+2025-08-10 13:58:11,029 - src.training.trainer - INFO - Checkpoint saved: ./checkpoints/checkpoint_epoch_5.pth
+Training Epoch 6: 100%|████████████████████████████████████████████████████████████████████| 5893/5893 [2:36:43<00:00,  1.60s/it, loss=2.8661, lr=3.0e-04, ce=2.210, ali=0.723, bow=1.593, div=0.531, var=0.011]
+2025-08-10 16:34:54,527 - src.training.trainer - INFO - Epoch 6 - Avg Loss: 2.1411
+2025-08-10 16:34:54,527 - src.training.trainer - INFO - Loss components: {'loss_ce': 1.853160886838969, 'loss_align': 0.17732784577605198, 'loss_bow': 1.060161546487143, 'loss_div': 0.38281017925856414, 'loss_var': 0.015117998242414742}
+2025-08-10 16:54:39,767 - src.training.trainer - INFO - Updated loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.104060401, 'var': 0.0520302005}                                                   
+2025-08-10 16:54:40,020 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 2.8416
+2025-08-10 16:54:40,021 - src.training.trainer - WARNING - Model stuck in repetitive generation for 6 evaluations
+2025-08-10 16:54:40,021 - src.training.trainer - WARNING - Consider adjusting loss weights or learning rates
+Training Epoch 7: 100%|████████████████████████████████████████████████████████████████████| 5893/5893 [2:37:06<00:00,  1.60s/it, loss=2.1248, lr=3.0e-04, ce=1.795, ali=0.280, bow=0.968, div=0.411, var=0.030]
+2025-08-10 19:31:47,166 - src.training.trainer - INFO - Epoch 7 - Avg Loss: 2.1304
+2025-08-10 19:31:47,167 - src.training.trainer - INFO - Loss components: {'loss_ce': 1.833568167751195, 'loss_align': 0.16468751555412986, 'loss_bow': 1.1607251231524327, 'loss_div': 0.38316739782572157, 'loss_var': 0.009148146627559273}
+2025-08-10 19:51:27,787 - src.training.trainer - INFO - Updated loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.10510100501, 'var': 0.052550502505}                                               
+2025-08-10 19:51:28,031 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 2.7368
+2025-08-10 19:51:28,031 - src.training.trainer - WARNING - Model stuck in repetitive generation for 7 evaluations
+2025-08-10 19:51:28,031 - src.training.trainer - WARNING - Consider adjusting loss weights or learning rates
+Training Epoch 8: 100%|████████████████████████████████████████████████████████████████████| 5893/5893 [2:36:45<00:00,  1.60s/it, loss=1.9774, lr=3.0e-04, ce=1.763, ali=0.126, bow=0.859, div=0.209, var=0.011]
+2025-08-10 22:28:13,653 - src.training.trainer - INFO - Epoch 8 - Avg Loss: 2.0845
+2025-08-10 22:28:13,654 - src.training.trainer - INFO - Loss components: {'loss_ce': 1.7924390503896146, 'loss_align': 0.1736885428666854, 'loss_bow': 1.098584984177425, 'loss_div': 0.379320875475246, 'loss_var': 0.011039730542319215}
+2025-08-10 22:47:39,969 - src.training.trainer - INFO - Updated loss weights: {'ce': 1.0, 'align': 0.5, 'bow': 0.15, 'div': 0.1061520150601, 'var': 0.05307600753005}                                           
+2025-08-10 22:47:40,187 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 2.7019
+2025-08-10 22:47:40,187 - src.training.trainer - WARNING - Model stuck in repetitive generation for 8 evaluations
+2025-08-10 22:47:40,188 - src.training.trainer - WARNING - Consider adjusting loss weights or learning rates
+Training Epoch 9:  37%|█████████████████████████▍                                          | 2204/5893 [58:39<1:37:12,  1.58s/it, loss=1.9699, lr=3.0e-04, ce=1.767, ali=0.009, bow=1.114, div=0.289, var=0.006]

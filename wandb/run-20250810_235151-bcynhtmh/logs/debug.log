@@ -1,0 +1,21 @@
+2025-08-10 23:51:51,479 INFO    MainThread:5652 [wandb_setup.py:_flush():80] Current SDK version is 0.21.0
+2025-08-10 23:51:51,480 INFO    MainThread:5652 [wandb_setup.py:_flush():80] Configure stats pid to 5652
+2025-08-10 23:51:51,480 INFO    MainThread:5652 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Marco\.config\wandb\settings
+2025-08-10 23:51:51,480 INFO    MainThread:5652 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Marco\Desktop\Inner Speech Translation\wandb\settings
+2025-08-10 23:51:51,480 INFO    MainThread:5652 [wandb_setup.py:_flush():80] Loading settings from environment variables
+2025-08-10 23:51:51,480 INFO    MainThread:5652 [wandb_init.py:setup_run_log_directory():703] Logging user logs to C:\Users\Marco\Desktop\Inner Speech Translation\wandb\run-20250810_235151-bcynhtmh\logs\debug.log
+2025-08-10 23:51:51,482 INFO    MainThread:5652 [wandb_init.py:setup_run_log_directory():704] Logging internal logs to C:\Users\Marco\Desktop\Inner Speech Translation\wandb\run-20250810_235151-bcynhtmh\logs\debug-internal.log
+2025-08-10 23:51:51,482 INFO    MainThread:5652 [wandb_init.py:init():830] calling init triggers
+2025-08-10 23:51:51,482 INFO    MainThread:5652 [wandb_init.py:init():835] wandb.init called with sweep_config: {}
+config: {'data_dir': 'data/eeg_data/', 'montage_file': 'data/montage.csv', 'save_dir': './checkpoints/', 'pretrained_model': 'fnlp/bart-base-chinese', 'hidden_dim': 768, 'n_timepoints': 1651, 'max_length': 16, 'disable_cross_region_attn': False, 'uniform_region_weight': False, 'cnn_only': False, 'epochs': 100, 'batch_size': 4, 'accumulation_steps': 8, 'patience': 15, 'grad_clip_norm': 0.5, 'brain_encoder_lr': 1e-05, 'bart_decoder_lr': 1e-06, 'projection_lr': 1e-05, 'warmup_steps': 100, 'weight_decay': 0.001, 'loss_weights': {'ce': 0.2, 'align': 3.0, 'bow': 2.0, 'div': 5.0, 'var': 2.0}, 'use_adaptive_loss': True, 'adaptation_rate': 0.1, 'adaptation_patience': 1, 'label_smoothing': 0.15, 'bow_vocab_size': 1000, 'contrastive_tau': 0.05, 'generation': {'eval': {'max_length': 16, 'min_length': 3, 'do_sample': True, 'temperature': 2.0, 'top_k': 0, 'top_p': 0.95, 'repetition_penalty': 3.0, 'no_repeat_ngram_size': 1}, 'train': {'do_sample': True, 'max_length': 16, 'min_length': 3, 'temperature': 2.5, 'top_p': 0.95, 'top_k': 0, 'repetition_penalty': 3.0, 'no_repeat_ngram_size': 1}}, 'train_split': 0.8, 'val_split': 0.1, 'test_split': 0.1, 'num_workers': 0, 'augmentation': {'enabled': True, 'noise_std': 0.05, 'scale_range': (0.8, 1.2), 'time_shift': 5}, 'experiment_name': 'EEG-Chinese-EMERGENCY-ANTICOLAPSE', 'log_interval': 10, 'eval_interval': 1, 'save_interval': 2, 'monitor_metrics': {'primary': 'val_diversity_score', 'secondary': 'val_bleu_4', 'early_stopping': 'val_diversity_score', 'mode': 'max'}, 'seed': 42, 'deterministic': False, 'mixed_precision': False, 'min_diversity_score': 0.5, 'max_diversity_score': 0.95, 'max_gradient_norm': 0.5, 'emergency_mode': True, 'add_noise_to_features': True, 'noise_schedule': 'linear_decay', 'initial_noise_std': 0.3, 'final_noise_std': 0.05, 'noise_decay_epochs': 10, 'force_different_outputs': True, '_wandb': {}}
+2025-08-10 23:51:51,482 INFO    MainThread:5652 [wandb_init.py:init():871] starting backend
+2025-08-10 23:51:51,773 INFO    MainThread:5652 [wandb_init.py:init():874] sending inform_init request
+2025-08-10 23:51:51,804 INFO    MainThread:5652 [wandb_init.py:init():882] backend started and connected
+2025-08-10 23:51:51,805 INFO    MainThread:5652 [wandb_init.py:init():953] updated telemetry
+2025-08-10 23:51:51,836 INFO    MainThread:5652 [wandb_init.py:init():977] communicating run to backend with 90.0 second timeout
+2025-08-10 23:51:52,456 INFO    MainThread:5652 [wandb_init.py:init():1029] starting run threads in backend
+2025-08-10 23:51:52,922 INFO    MainThread:5652 [wandb_run.py:_console_start():2458] atexit reg
+2025-08-10 23:51:52,922 INFO    MainThread:5652 [wandb_run.py:_redirect():2306] redirect: wrap_raw
+2025-08-10 23:51:52,922 INFO    MainThread:5652 [wandb_run.py:_redirect():2375] Wrapping output streams.
+2025-08-10 23:51:52,922 INFO    MainThread:5652 [wandb_run.py:_redirect():2398] Redirects installed.
+2025-08-10 23:51:52,924 INFO    MainThread:5652 [wandb_init.py:init():1075] run started, returning control to user process
