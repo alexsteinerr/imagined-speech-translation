@@ -60,17 +60,11 @@ def setup_model_and_tokenizer(device):
     vocab_size = len(tokenizer.get_vocab())
     logger.info(f"Tokenizer loaded. Vocab size: {vocab_size}")
     
-    # CRITICAL: Check if vocab size matches expected BART vocab size
-    expected_vocab = 51271  # BART Chinese vocab size
-    if vocab_size != expected_vocab:
-        logger.warning(f"Vocab size mismatch! Expected {expected_vocab}, got {vocab_size}")
-        logger.warning("This may cause indexing errors. Checking tokenizer...")
-        
-        # Log some token IDs for debugging
-        logger.info(f"PAD token ID: {tokenizer.pad_token_id}")
-        logger.info(f"EOS token ID: {tokenizer.eos_token_id}")
-        logger.info(f"BOS token ID: {tokenizer.bos_token_id if hasattr(tokenizer, 'bos_token_id') else 'N/A'}")
-        logger.info(f"CLS token ID: {tokenizer.cls_token_id if hasattr(tokenizer, 'cls_token_id') else 'N/A'}")
+    # Log special tokens for debugging
+    logger.info(f"Tokenizer special tokens: "
+                f"PAD={tokenizer.pad_token_id}, "
+                f"EOS={tokenizer.eos_token_id}, "
+                f"BOS={tokenizer.bos_token_id}")
     
     # Get region channel counts (will be set from dataset)
     region_channel_counts = {
@@ -83,7 +77,7 @@ def setup_model_and_tokenizer(device):
     logger.info("Creating model...")
     model = EEGDecodingModel(
         n_timepoints=CONFIG['n_timepoints'],
-        region_channel_counts=region_channel_counts,  # Will be updated
+        region_channel_counts=region_channel_counts,
         hidden_dim=CONFIG['hidden_dim'],
         disable_cross_region_attn=CONFIG.get('disable_cross_region_attn', False),
         uniform_region_weight=CONFIG.get('uniform_region_weight', False),
@@ -92,6 +86,13 @@ def setup_model_and_tokenizer(device):
     
     # Move model to device
     model = model.to(device)
+    
+    # CRITICAL FIX: Validate and resize embeddings if needed
+    model_vocab_size = model.bart_decoder.bart.get_input_embeddings().weight.size(0)
+    if vocab_size != model_vocab_size:
+        logger.warning(f"Vocab size mismatch! Tokenizer: {vocab_size}, Model: {model_vocab_size}")
+        logger.warning("Resizing model embeddings to match tokenizer")
+        model.bart_decoder.bart.resize_token_embeddings(vocab_size)
     
     # Initialize weights for non-pretrained components
     initialize_custom_weights(model)

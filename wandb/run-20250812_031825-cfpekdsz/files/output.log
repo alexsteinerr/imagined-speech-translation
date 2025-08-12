@@ -1,0 +1,80 @@
+2025-08-12 03:18:27,574 - __main__ - INFO - W&B initialized: EEG-Chinese-BalancedRecovery
+2025-08-12 03:18:27,574 - __main__ - INFO - Loading tokenizer...
+2025-08-12 03:18:27,894 - __main__ - INFO - Tokenizer loaded. Vocab size: 51271
+2025-08-12 03:18:27,895 - __main__ - INFO - Tokenizer special tokens: PAD=0, EOS=104, BOS=101
+2025-08-12 03:18:27,896 - __main__ - INFO - Creating model...
+C:\Users\Marco\anaconda3\Lib\site-packages\torch\nn\modules\transformer.py:307: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+2025-08-12 03:18:30,576 - __main__ - INFO - Custom weights initialized
+2025-08-12 03:18:30,578 - __main__ - INFO - Model created. Total params: 366,039,177, Trainable: 366,039,177
+2025-08-12 03:18:30,579 - __main__ - INFO - Loading dataset...
+2025-08-12 03:18:30,589 - src.data.dataset - INFO - Tokenizer vocabulary size: 51271
+2025-08-12 03:18:30,597 - src.data.dataset - INFO - Frontal region: 16 channels - ['FC5', 'F5', 'F7', 'F3', 'FC1', 'F1', 'AF3', 'Fz', 'FC2', 'F2', 'AF4', 'Fp2', 'F4', 'F6', 'F8', 'FC6']
+2025-08-12 03:18:30,597 - src.data.dataset - INFO - Temporal region: 9 channels - ['T9', 'FT9', 'T7', 'TP7', 'FT8', 'T10', 'FT10', 'T8', 'TP8']
+2025-08-12 03:18:30,597 - src.data.dataset - INFO - Central region: 11 channels - ['C5', 'C3', 'FC3', 'C1', 'CP1', 'Cz', 'CP2', 'C2', 'C4', 'FC4', 'C6']
+2025-08-12 03:18:30,598 - src.data.dataset - INFO - Parietal region: 12 channels - ['P7', 'P5', 'CP3', 'P3', 'PO3', 'PO1', 'PO2', 'P4', 'PO4', 'P6', 'CP4', 'P8']
+2025-08-12 03:18:30,598 - src.data.dataset - INFO - Total channels mapped: 48/125
+2025-08-12 03:18:30,598 - src.data.dataset - INFO - Tokenizer validation passed. Key IDs: pad=0, eos=104, bos=101
+Discovering data files...
+2025-08-12 03:18:30,599 - src.data.dataset - INFO - Found 225 .pkl files
+2025-08-12 03:18:56,187 - src.data.dataset - INFO - Built index for 29466 samples
+Computing normalization parameters from sample...
+2025-08-12 03:19:06,359 - src.data.dataset - INFO - Fitted scaler for frontal with 100 samples
+2025-08-12 03:19:06,381 - src.data.dataset - INFO - Fitted scaler for temporal with 100 samples
+2025-08-12 03:19:06,409 - src.data.dataset - INFO - Fitted scaler for central with 100 samples
+2025-08-12 03:19:06,440 - src.data.dataset - INFO - Fitted scaler for parietal with 100 samples
+Dataset initialized with 29466 samples
+2025-08-12 03:19:06,534 - __main__ - INFO - Dataset loaded: 29466 samples
+2025-08-12 03:19:06,534 - __main__ - INFO - Region channel counts: {'frontal': 16, 'temporal': 9, 'central': 11, 'parietal': 12}
+2025-08-12 03:19:06,538 - __main__ - INFO - Data splits - Train: 23572, Val: 2946, Test: 2948
+2025-08-12 03:19:06,539 - __main__ - INFO - DataLoader settings - pin_memory: False, num_workers: 0
+2025-08-12 03:19:06,541 - __main__ - INFO - Param group 0: 210,801,736 params, lr=3.00e-04
+2025-08-12 03:19:06,541 - __main__ - INFO - Param group 1: 4,730,112 params, lr=1.00e-04
+2025-08-12 03:19:06,541 - __main__ - INFO - Param group 2: 100,897,601 params, lr=3.00e-05
+2025-08-12 03:19:06,541 - __main__ - INFO - Param group 3: 49,609,728 params, lr=5.00e-05
+C:\Users\Marco\anaconda3\Lib\site-packages\transformers\optimization.py:591: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
+  warnings.warn(
+2025-08-12 03:19:06,544 - __main__ - INFO - Training steps: 73600 total, 500 warmup
+2025-08-12 03:19:06,544 - __main__ - INFO - Optimizer and cosine scheduler created
+2025-08-12 03:19:06,545 - __main__ - INFO - Checkpoints will be saved to: ./checkpoints/
+2025-08-12 03:19:06,545 - absl - INFO - Using default tokenizer.
+2025-08-12 03:19:06,572 - src.training.losses - INFO - Selected 2000 BoW indices from vocabulary of size 51271
+2025-08-12 03:19:06,638 - src.training.trainer - INFO - Composite loss initialized with 2000 BoW indices
+2025-08-12 03:19:06,638 - src.training.trainer - INFO - Trainer initialized with composite loss
+2025-08-12 03:19:06,638 - src.training.trainer - INFO - Loss weights: {'ce': 1.0, 'align': 0.3, 'bow': 0.1, 'div': 0.2, 'var': 0.05}
+2025-08-12 03:19:06,638 - __main__ - INFO - ============================================================
+2025-08-12 03:19:06,639 - __main__ - INFO - Starting training with composite loss
+2025-08-12 03:19:06,639 - __main__ - INFO - Epochs: 100
+2025-08-12 03:19:06,639 - __main__ - INFO - Batch size: 4
+2025-08-12 03:19:06,639 - __main__ - INFO - Accumulation steps: 8
+2025-08-12 03:19:06,640 - __main__ - INFO - Effective batch size: 32
+2025-08-12 03:19:06,640 - __main__ - INFO - ============================================================
+2025-08-12 03:19:06,640 - src.training.trainer - INFO - ============================================================
+2025-08-12 03:19:06,640 - src.training.trainer - INFO - Starting training with composite loss
+2025-08-12 03:19:06,640 - src.training.trainer - INFO - Initial loss weights: {'ce': 1.0, 'align': 0.3, 'bow': 0.1, 'div': 0.2, 'var': 0.05}
+2025-08-12 03:19:06,640 - src.training.trainer - INFO - Adaptive scheduling: True
+2025-08-12 03:19:06,640 - src.training.trainer - INFO - ============================================================
+Training Epoch 1:   0%|                                                                                                                                           | 0/5893 [00:00<?, ?it/s]C:\Users\Marco\anaconda3\Lib\site-packages\torch\nn\functional.py:5560: UserWarning: 1Torch was not compiled with flash attention. (Triggered internally at C:\cb\pytorch_1000000000000\work\aten\src\ATen\native\transformers\cuda\sdp_utils.cpp:555.)
+  attn_output = scaled_dot_product_attention(q, k, v, attn_mask, dropout_p, is_causal)
+Training Epoch 1: 100%|███████████████████████████████████████████████| 5893/5893 [2:37:49<00:00,  1.61s/it, loss=3.5324, lr=3.0e-04, ce=3.252, ali=0.225, bow=1.422, div=0.350, var=0.004]
+2025-08-12 05:56:55,919 - src.training.trainer - INFO - Epoch 1 - Avg Loss: 4.7470
+2025-08-12 05:56:55,919 - src.training.trainer - INFO - Loss components: {'loss_ce': 4.1656318327455315, 'loss_align': 1.023972536614691, 'loss_bow': 1.0793457329475513, 'loss_div': 0.7412520990208051, 'loss_var': 0.36026505875601433}
+Building prefix dict from the default dictionary ...                                                                                                                                       
+2025-08-12 06:16:26,069 - jieba - DEBUG - Building prefix dict from the default dictionary ...
+Loading model from cache C:\Users\Marco\AppData\Local\Temp\jieba.cache
+2025-08-12 06:16:26,069 - jieba - DEBUG - Loading model from cache C:\Users\Marco\AppData\Local\Temp\jieba.cache
+Loading model cost 0.446 seconds.
+2025-08-12 06:16:26,515 - jieba - DEBUG - Loading model cost 0.446 seconds.
+Prefix dict has been built successfully.
+2025-08-12 06:16:26,517 - jieba - DEBUG - Prefix dict has been built successfully.
+2025-08-12 06:16:28,604 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 3.7325
+Training Epoch 2: 100%|███████████████████████████████████████████████| 5893/5893 [2:37:27<00:00,  1.60s/it, loss=2.8207, lr=3.0e-04, ce=2.538, ali=0.334, bow=1.153, div=0.334, var=0.013]
+2025-08-12 08:53:55,809 - src.training.trainer - INFO - Epoch 2 - Avg Loss: 3.1639
+2025-08-12 08:53:55,810 - src.training.trainer - INFO - Loss components: {'loss_ce': 2.8542668246947787, 'loss_align': 0.3700094763737949, 'loss_bow': 1.2432644998766298, 'loss_div': 0.368319818754765, 'loss_var': 0.012530940435422595}
+2025-08-12 09:13:31,305 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 3.2530                                                                         
+Training Epoch 3: 100%|███████████████████████████████████████████████| 5893/5893 [2:37:57<00:00,  1.61s/it, loss=2.6263, lr=3.0e-04, ce=2.299, ali=0.266, bow=1.701, div=0.388, var=0.002]
+2025-08-12 11:51:29,052 - src.training.trainer - INFO - Epoch 3 - Avg Loss: 2.7603
+2025-08-12 11:51:29,052 - src.training.trainer - INFO - Loss components: {'loss_ce': 2.414351614468696, 'loss_align': 0.35756805312637874, 'loss_bow': 1.5409139489633976, 'loss_div': 0.4216785126234707, 'loss_var': 0.005925757590819822}
+2025-08-12 12:11:07,820 - src.training.trainer - INFO - Updated loss weights: {'ce': 1.0, 'align': 0.3, 'bow': 0.1, 'div': 0.20400000000000001, 'var': 0.051000000000000004}               
+2025-08-12 12:11:08,020 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 2.9359
+Training Epoch 4:  77%|████████████████████████████████████▎          | 4554/5893 [2:02:19<38:05,  1.71s/it, loss=2.2864, lr=3.0e-04, ce=1.975, ali=0.263, bow=1.537, div=0.382, var=0.014]

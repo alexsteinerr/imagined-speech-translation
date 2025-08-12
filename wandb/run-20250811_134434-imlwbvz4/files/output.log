@@ -3025,4 +3025,4 @@ Evaluating: 100%|█████████████████████
 2025-08-12 01:21:16,324 - src.evaluation.evaluator - WARNING - No valid prediction-reference pairs found                             
 2025-08-12 01:21:16,324 - src.training.trainer - INFO - Updated loss weights: {'ce': 1.0, 'align': 0.3, 'bow': 0.1, 'div': 0.20808000000000001, 'var': 0.052020000000000004}
 2025-08-12 01:21:16,552 - src.training.trainer - INFO - Validation - BLEU-4: 0.000, Diversity: 0.000, Loss: 2.8302
-Training Epoch 5:  31%|▎| 1807/5893 [48:16<1:55:11,  1.69s/it, loss=2.1926, lr=3.0e-04, ce=2.010, ali=0.088, bow=1.146, div=0.196, va
+Training Epoch 5:  32%|▎| 1899/5893 [50:43<1:50:41,  1.66s/it, loss=2.2964, lr=3.0e-04, ce=2.142, ali=0.066, bow=1.059, div=0.137, va

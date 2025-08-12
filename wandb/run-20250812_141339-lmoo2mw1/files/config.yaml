@@ -1,0 +1,123 @@
+_wandb:
+    value:
+        cli_version: 0.21.0
+        e:
+            bjqn93mrt05zigqjfmz8igks3tpt8mlj:
+                codePath: scripts\train.py
+                codePathLocal: scripts\train.py
+                cpu_count: 14
+                cpu_count_logical: 20
+                cudaVersion: "12.6"
+                disk:
+                    /:
+                        total: "999322284032"
+                        used: "815274541056"
+                email: steiner.alex40@gmail.com
+                executable: C:\Users\Marco\anaconda3\python.exe
+                git:
+                    commit: 131fd034bdeb45b7ae142f931c2b9ecee2b11d58
+                    remote: https://github.com/AlexSteiner30/Inner-Speech-Translation.git
+                gpu: NVIDIA GeForce RTX 3090
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 10496
+                      memoryTotal: "25769803776"
+                      name: NVIDIA GeForce RTX 3090
+                      uuid: GPU-d2039fc6-5578-397e-08f9-15d05bbcd077
+                host: DESKTOP-TMTD4FG
+                memory:
+                    total: "34183200768"
+                os: Windows-11-10.0.26100-SP0
+                program: C:\Users\Marco\Desktop\Inner Speech Translation\scripts\train.py
+                python: CPython 3.12.4
+                root: C:\Users\Marco\Desktop\Inner Speech Translation
+                startedAt: "2025-08-12T12:13:39.854854Z"
+                writerId: bjqn93mrt05zigqjfmz8igks3tpt8mlj
+        m: []
+        python_version: 3.12.4
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 71
+            "2":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 71
+            "3":
+                - 13
+                - 15
+                - 16
+            "4": 3.12.4
+            "5": 0.21.0
+            "6": 4.46.2
+            "8":
+                - 3
+            "12": 0.21.0
+            "13": windows-amd64
+accumulation_steps:
+    value: 8
+bart_decoder_lr:
+    value: 3e-05
+batch_size:
+    value: 4
+brain_encoder_lr:
+    value: 0.0003
+data_dir:
+    value: data/eeg_data/
+epochs:
+    value: 100
+eval_interval:
+    value: 1
+generation:
+    value:
+        eval:
+            early_stopping: true
+            max_length: 16
+            min_length: 4
+            num_beams: 3
+grad_clip_norm:
+    value: 1
+hidden_dim:
+    value: 768
+log_interval:
+    value: 20
+max_length:
+    value: 16
+montage_file:
+    value: data/montage.csv
+n_timepoints:
+    value: 1651
+num_workers:
+    value: 0
+patience:
+    value: 20
+pretrained_model:
+    value: fnlp/bart-base-chinese
+projection_lr:
+    value: 0.0001
+save_dir:
+    value: ./checkpoints/
+save_interval:
+    value: 5
+seed:
+    value: 42
+test_split:
+    value: 0.1
+train_split:
+    value: 0.8
+val_split:
+    value: 0.1
+warmup_steps:
+    value: 500
+weight_decay:
+    value: 0.01

@@ -1,0 +1,22 @@
+2025-08-12 14:13:39,857 INFO    MainThread:26840 [wandb_setup.py:_flush():80] Current SDK version is 0.21.0
+2025-08-12 14:13:39,857 INFO    MainThread:26840 [wandb_setup.py:_flush():80] Configure stats pid to 26840
+2025-08-12 14:13:39,857 INFO    MainThread:26840 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Marco\.config\wandb\settings
+2025-08-12 14:13:39,857 INFO    MainThread:26840 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Marco\Desktop\Inner Speech Translation\wandb\settings
+2025-08-12 14:13:39,857 INFO    MainThread:26840 [wandb_setup.py:_flush():80] Loading settings from environment variables
+2025-08-12 14:13:39,857 INFO    MainThread:26840 [wandb_init.py:setup_run_log_directory():703] Logging user logs to C:\Users\Marco\Desktop\Inner Speech Translation\wandb\run-20250812_141339-lmoo2mw1\logs\debug.log
+2025-08-12 14:13:39,858 INFO    MainThread:26840 [wandb_init.py:setup_run_log_directory():704] Logging internal logs to C:\Users\Marco\Desktop\Inner Speech Translation\wandb\run-20250812_141339-lmoo2mw1\logs\debug-internal.log
+2025-08-12 14:13:39,858 INFO    MainThread:26840 [wandb_init.py:init():830] calling init triggers
+2025-08-12 14:13:39,858 INFO    MainThread:26840 [wandb_init.py:init():835] wandb.init called with sweep_config: {}
+config: {'data_dir': 'data/eeg_data/', 'montage_file': 'data/montage.csv', 'save_dir': './checkpoints/', 'pretrained_model': 'fnlp/bart-base-chinese', 'hidden_dim': 768, 'n_timepoints': 1651, 'max_length': 16, 'epochs': 100, 'batch_size': 4, 'accumulation_steps': 8, 'patience': 20, 'grad_clip_norm': 1.0, 'brain_encoder_lr': 0.0003, 'bart_decoder_lr': 3e-05, 'projection_lr': 0.0001, 'warmup_steps': 500, 'weight_decay': 0.01, 'generation': {'eval': {'max_length': 16, 'min_length': 4, 'num_beams': 3, 'early_stopping': True}}, 'train_split': 0.8, 'val_split': 0.1, 'test_split': 0.1, 'num_workers': 0, 'log_interval': 20, 'eval_interval': 1, 'save_interval': 5, 'seed': 42, '_wandb': {}}
+2025-08-12 14:13:39,858 INFO    MainThread:26840 [wandb_init.py:init():871] starting backend
+2025-08-12 14:13:40,070 INFO    MainThread:26840 [wandb_init.py:init():874] sending inform_init request
+2025-08-12 14:13:40,095 INFO    MainThread:26840 [wandb_init.py:init():882] backend started and connected
+2025-08-12 14:13:40,095 INFO    MainThread:26840 [wandb_init.py:init():953] updated telemetry
+2025-08-12 14:13:40,130 INFO    MainThread:26840 [wandb_init.py:init():977] communicating run to backend with 90.0 second timeout
+2025-08-12 14:13:40,802 INFO    MainThread:26840 [wandb_init.py:init():1029] starting run threads in backend
+2025-08-12 14:13:41,266 INFO    MainThread:26840 [wandb_run.py:_console_start():2458] atexit reg
+2025-08-12 14:13:41,266 INFO    MainThread:26840 [wandb_run.py:_redirect():2306] redirect: wrap_raw
+2025-08-12 14:13:41,266 INFO    MainThread:26840 [wandb_run.py:_redirect():2375] Wrapping output streams.
+2025-08-12 14:13:41,266 INFO    MainThread:26840 [wandb_run.py:_redirect():2398] Redirects installed.
+2025-08-12 14:13:41,269 INFO    MainThread:26840 [wandb_init.py:init():1075] run started, returning control to user process
+2025-08-12 14:13:44,484 INFO    MsgRouterThr:26840 [mailbox.py:close():129] [no run ID] Closing mailbox, abandoning 1 handles.

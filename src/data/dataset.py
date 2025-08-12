@@ -336,11 +336,6 @@ class EEGDataset(Dataset):
         fallback_tokenization = self._create_fallback_tokenization()
         return {'eeg': eeg_regions, **fallback_tokenization}
 
-    # Keep all the other methods from original class (build_region_indices, validate_region_indices, 
-    # setup_tokenizer_safe, get_validated_data_files, validate_sample, safe_tokenize, 
-    # create_fallback_tokenization, print_regional_stats, get_sample_stats, get_regional_stats)
-    # ... [Include all the validation and utility methods from your original class]
-
     def _build_region_indices(self):
         """Build and validate region indices"""
         region_indices = {
@@ -462,10 +457,15 @@ class EEGDataset(Dataset):
                 logger.error(f"Negative token ID found: {min_id}")
                 input_ids = torch.clamp(input_ids, 0, self.vocab_size - 1)
             
-            # Create decoder input IDs safely
-            # Use CLS token (101) as decoder start if available, else use a safe token
-            decoder_start_token_id = min(101, self.vocab_size - 1)
-            
+            # FIXED: Create decoder input IDs safely
+            decoder_start_token_id = self.tokenizer.bos_token_id
+            if decoder_start_token_id is None:
+                decoder_start_token_id = self.tokenizer.eos_token_id
+                
+            if decoder_start_token_id is None or decoder_start_token_id >= self.vocab_size:
+                logger.warning(f"Invalid decoder_start_token_id: {decoder_start_token_id}")
+                decoder_start_token_id = self.tokenizer.pad_token_id
+                
             # Shift tokens right for decoder input
             decoder_input_ids = torch.cat([
                 torch.tensor([decoder_start_token_id]),
@@ -475,9 +475,9 @@ class EEGDataset(Dataset):
             # Ensure decoder input IDs are also valid
             decoder_input_ids = torch.clamp(decoder_input_ids, 0, self.vocab_size - 1)
             
-            # Create labels (input_ids with padding masked)
+            # CRITICAL FIX: Create labels (input_ids with padding masked)
             labels = input_ids.clone()
-            labels[labels == self.tokenizer.pad_token_id] = -100
+            labels[input_ids == self.tokenizer.pad_token_id] = -100
             
             # Final validation
             assert decoder_input_ids.max() < self.vocab_size, f"Decoder ID overflow: {decoder_input_ids.max()}"

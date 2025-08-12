@@ -1,0 +1,20 @@
+2025-08-12 14:13:41,269 - __main__ - INFO - W&B initialized: eeg_training_20250812_141339
+2025-08-12 14:13:41,269 - __main__ - INFO - Loading tokenizer...
+2025-08-12 14:13:41,555 - __main__ - INFO - Tokenizer loaded. Vocab size: 51271
+2025-08-12 14:13:41,556 - __main__ - INFO - Tokenizer special tokens: PAD=0, EOS=104, BOS=101
+2025-08-12 14:13:41,556 - __main__ - INFO - Creating model...
+C:\Users\Marco\anaconda3\Lib\site-packages\torch\nn\modules\transformer.py:307: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+2025-08-12 14:13:44,438 - __main__ - INFO - Custom weights initialized
+2025-08-12 14:13:44,441 - __main__ - INFO - Model created. Total params: 351,586,888, Trainable: 351,586,888
+2025-08-12 14:13:44,441 - __main__ - INFO - Loading dataset...
+Traceback (most recent call last):
+  File "C:\Users\Marco\Desktop\Inner Speech Translation\scripts\train.py", line 384, in <module>
+    main()
+  File "C:\Users\Marco\Desktop\Inner Speech Translation\scripts\train.py", line 309, in main
+    train_loader, val_loader, test_loader, region_channel_counts = setup_data_loaders(tokenizer)
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Marco\Desktop\Inner Speech Translation\scripts\train.py", line 139, in setup_data_loaders
+    data_augmentation=CONFIG['augmentation']['enabled']
+                      ~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'augmentation'

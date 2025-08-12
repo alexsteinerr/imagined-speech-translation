@@ -1,9 +1,8 @@
 """
-Enhanced training loop for EEG-to-text model with composite loss.
+Streamlined training loop using BART's built-in loss system.
 """
 
 import os
-import time
 import torch
 import wandb
 import numpy as np
@@ -11,29 +10,16 @@ from tqdm.auto import tqdm
 import logging
 
 from ..evaluation.evaluator import ChineseEvaluator
-from .losses import EnhancedCompositeSeq2SeqLoss, get_top_k_vocab_indices, AdaptiveLossScheduler
 
 logger = logging.getLogger(__name__)
 
 
 class EEGTrainer:
     """
-    Trainer class for EEG-to-text model with composite loss and anti-collapse mechanisms.
+    Trainer class using BART's standard loss implementation.
     """
     
     def __init__(self, model, tokenizer, train_loader, val_loader, optimizer, scheduler, config):
-        """
-        Initialize trainer with composite loss.
-        
-        Args:
-            model: EEG-to-text model
-            tokenizer: Text tokenizer
-            train_loader: Training data loader
-            val_loader: Validation data loader
-            optimizer: Optimizer
-            scheduler: Learning rate scheduler
-            config: Training configuration dictionary
-        """
         self.model = model
         self.tokenizer = tokenizer
         self.train_loader = train_loader
@@ -47,147 +33,24 @@ class EEGTrainer:
         
         # Training state
         self.best_bleu4 = 0.0
-        self.best_diversity = 0.0
         self.patience_counter = 0
         self.global_step = 0
         self.epoch = 0
-        
-        # Diversity tracking
-        self.diversity_history = []
-        self.repetition_history = []
-        
-        # Initialize composite loss
-        self._initialize_composite_loss()
-        
-        # Initialize adaptive scheduler if enabled
-        if config.get('use_adaptive_loss', True):
-            self._initialize_adaptive_scheduler()
-        else:
-            self.adaptive_scheduler = None
-        
-        logger.info(f"Trainer initialized with composite loss")
-        logger.info(f"Loss weights: {self.config['loss_weights']}")
-
-    def _initialize_composite_loss(self):
-        """Initialize the composite loss function."""
-        # Get BoW indices
-        bow_vocab_size = self.config.get('bow_vocab_size', 2000)
-        bow_indices = get_top_k_vocab_indices(self.tokenizer, k=bow_vocab_size)
-        
-        # Create composite loss
-        loss_weights = self.config['loss_weights']
-        self.composite_loss = EnhancedCompositeSeq2SeqLoss(
-            vocab_size=len(self.tokenizer.get_vocab()),
-            hidden_dim=self.config['hidden_dim'],
-            pad_token_id=self.tokenizer.pad_token_id,
-            bow_indices=bow_indices,
-            label_smoothing=self.config.get('label_smoothing', 0.05),
-            w_ce=loss_weights['ce'],
-            w_align=loss_weights['align'],
-            w_bow=loss_weights['bow'],
-            w_div=loss_weights['div'],
-            w_var=loss_weights['var'],
-            tau=self.config.get('contrastive_tau', 0.07)
-        ).to(self.device)
-        
-        logger.info(f"Composite loss initialized with {len(bow_indices)} BoW indices")
-
-    def _initialize_adaptive_scheduler(self):
-        """Initialize adaptive loss weight scheduler."""
-        self.adaptive_scheduler = AdaptiveLossScheduler(
-            initial_weights=self.config['loss_weights'].copy(),
-            adaptation_rate=self.config.get('adaptation_rate', 0.01),
-            min_weights={
-                'ce': 1.0,      # CE always stays at 1.0
-                'align': 0.2,   # Minimum alignment
-                'bow': 0.05,    # Minimum BoW
-                'div': 0.02,    # Minimum diversity
-                'var': 0.01     # Minimum variance
-            },
-            max_weights={
-                'ce': 1.0,      # CE always stays at 1.0
-                'align': 0.8,   # Maximum alignment
-                'bow': 0.3,     # Maximum BoW
-                'div': 0.3,     # Maximum diversity
-                'var': 0.15     # Maximum variance
-            }
-        )
 
     def forward_pass(self, eeg, decoder_input_ids, labels):
         """
-        Forward pass with composite loss computation.
-        
-        Args:
-            eeg: List of EEG tensors for each brain region
-            decoder_input_ids: Decoder input token IDs
-            labels: Target labels for loss computation
-            
-        Returns:
-            Model outputs with loss and components
+        Simplified forward pass using BART's internal loss.
         """
         try:
-            # Validate inputs thoroughly
-            vocab_size = len(self.tokenizer.get_vocab())
-            
-            # Check decoder input IDs
-            if decoder_input_ids.numel() > 0:
-                max_decoder_id = decoder_input_ids.max().item()
-                if max_decoder_id >= vocab_size:
-                    logger.error(f"Invalid decoder token ID: {max_decoder_id} >= {vocab_size}")
-                    # Try to recover by clamping
-                    decoder_input_ids = torch.clamp(decoder_input_ids, 0, vocab_size - 1)
-            
-            # Check labels
-            if labels.numel() > 0:
-                valid_labels = labels[labels != -100]
-                if valid_labels.numel() > 0:
-                    max_label_id = valid_labels.max().item()
-                    if max_label_id >= vocab_size:
-                        logger.error(f"Invalid label token ID: {max_label_id} >= {vocab_size}")
-                        # Try to recover by clamping
-                        labels = torch.where(
-                            labels == -100,
-                            labels,
-                            torch.clamp(labels, 0, vocab_size - 1)
-                        )
-            
             # Get EEG features
             eeg_features = self.model.brain_encoder(eeg)
             
-            # Forward through decoder WITHOUT passing labels (we compute loss separately)
-            # This avoids the internal loss computation of BART
+            # Forward through decoder WITH labels
             outputs = self.model.bart_decoder(
                 eeg_feat=eeg_features,
                 decoder_input_ids=decoder_input_ids,
-                labels=None  # Don't pass labels to avoid internal loss computation
+                labels=labels
             )
-            
-            # Extract components
-            logits = outputs.logits if hasattr(outputs, 'logits') else outputs.get('logits')
-            decoder_hidden = outputs.decoder_hidden if hasattr(outputs, 'decoder_hidden') else None
-            
-            if logits is None:
-                logger.error("No logits in model output")
-                return None
-            
-            # Create attention mask
-            attention_mask = (decoder_input_ids != self.tokenizer.pad_token_id).float()
-            
-            # Compute composite loss
-            loss_dict = self.composite_loss(
-                logits=logits,
-                labels=labels,
-                attention_mask=attention_mask,
-                encoder_features=eeg_features,
-                decoder_hidden=decoder_hidden,
-                return_components=True
-            )
-            
-            # Package outputs
-            outputs.loss = loss_dict['loss']
-            outputs.loss_components = {k: v.item() if torch.is_tensor(v) else v 
-                                    for k, v in loss_dict.items() if k != 'loss'}
-            outputs.eeg_features = eeg_features
             
             return outputs
             
@@ -201,36 +64,15 @@ class EEGTrainer:
                 raise e
         except Exception as e:
             logger.error(f"Unexpected error in forward pass: {e}")
-            import traceback
-            traceback.print_exc()
             return None
 
     def train_epoch(self, epoch):
-        """
-        Train for one epoch with composite loss.
-        
-        Args:
-            epoch: Current epoch number
-            
-        Returns:
-            Average training loss for the epoch
-        """
         self.model.train()
         self.epoch = epoch
         
         total_loss = 0.0
         total_samples = 0
         accumulation_step = 0
-        
-        # Track loss components
-        loss_components_sum = {
-            'loss_ce': 0.0,
-            'loss_align': 0.0,
-            'loss_bow': 0.0,
-            'loss_div': 0.0,
-            'loss_var': 0.0
-        }
-        component_counts = 0
         
         pbar = tqdm(self.train_loader, desc=f"Training Epoch {epoch+1}")
         
@@ -241,7 +83,7 @@ class EEGTrainer:
                 decoder_input_ids = batch['decoder_input_ids'].to(self.device)
                 labels = batch['labels'].to(self.device)
                 
-                # Forward pass with composite loss
+                # Forward pass
                 outputs = self.forward_pass(eeg, decoder_input_ids, labels)
                 
                 if outputs is None or outputs.loss is None:
@@ -251,22 +93,9 @@ class EEGTrainer:
                 # Scale loss for gradient accumulation
                 loss = outputs.loss / self.config['accumulation_steps']
                 
-                # Check for NaN/Inf
-                if torch.isnan(loss) or torch.isinf(loss):
-                    logger.warning(f"NaN/Inf loss detected at step {step}")
-                    self.optimizer.zero_grad()
-                    continue
-                
                 # Backward pass
                 loss.backward()
                 accumulation_step += 1
-                
-                # Accumulate loss components
-                if hasattr(outputs, 'loss_components'):
-                    for key, value in outputs.loss_components.items():
-                        if key in loss_components_sum:
-                            loss_components_sum[key] += value
-                    component_counts += 1
                 
                 # Optimizer step
                 if accumulation_step >= self.config['accumulation_steps']:
@@ -289,7 +118,17 @@ class EEGTrainer:
                 
                 # Logging
                 if step % self.config['log_interval'] == 0 and step > 0:
-                    self._log_training_step(outputs, pbar)
+                    current_lr = self.optimizer.param_groups[0]['lr']
+                    pbar.set_postfix({
+                        'loss': f"{outputs.loss.item():.4f}",
+                        'lr': f"{current_lr:.1e}"
+                    })
+                    
+                    wandb.log({
+                        "train/loss": outputs.loss.item(),
+                        "train/lr": current_lr,
+                        "step": self.global_step
+                    })
                     
             except Exception as e:
                 logger.error(f"Error in training step {step}: {e}")
@@ -305,23 +144,13 @@ class EEGTrainer:
             self.optimizer.step()
             self.optimizer.zero_grad()
         
-        # Calculate epoch averages
+        # Calculate epoch average loss
         avg_loss = total_loss / total_samples if total_samples > 0 else float('inf')
-        
-        # Log epoch summary
-        if component_counts > 0:
-            epoch_components = {k: v / component_counts for k, v in loss_components_sum.items()}
-            self._log_epoch_summary(epoch, avg_loss, epoch_components)
+        logger.info(f"Epoch {epoch+1} - Avg Loss: {avg_loss:.4f}")
         
         return avg_loss
 
     def evaluate(self):
-        """
-        Evaluate model on validation set.
-        
-        Returns:
-            Dictionary of evaluation metrics
-        """
         self.model.eval()
         
         all_predictions = []
@@ -329,20 +158,8 @@ class EEGTrainer:
         total_val_loss = 0.0
         total_samples = 0
         
-        # Loss component tracking
-        loss_components_sum = {
-            'loss_ce': 0.0,
-            'loss_align': 0.0,
-            'loss_bow': 0.0,
-            'loss_div': 0.0,
-            'loss_var': 0.0
-        }
-        component_counts = 0
-        
-        # Get generation config for evaluation
+        # Get generation config
         gen_config = self.config['generation']['eval'].copy()
-        gen_config['pad_token_id'] = self.tokenizer.pad_token_id
-        gen_config['eos_token_id'] = self.tokenizer.eos_token_id
         
         with torch.no_grad():
             for batch in tqdm(self.val_loader, desc="Evaluating", leave=False):
@@ -358,24 +175,25 @@ class EEGTrainer:
                     if val_outputs is not None and val_outputs.loss is not None:
                         total_val_loss += val_outputs.loss.item() * len(labels)
                         total_samples += len(labels)
-                        
-                        # Track loss components
-                        if hasattr(val_outputs, 'loss_components'):
-                            for key, value in val_outputs.loss_components.items():
-                                if key in loss_components_sum:
-                                    loss_components_sum[key] += value
-                            component_counts += 1
                     
                     # Generate predictions
                     generated_ids = self.model.generate(eeg_data=eeg, **gen_config)
                     
                     # Decode predictions and targets
                     for i in range(len(generated_ids)):
-                        pred_text = self.tokenizer.decode(generated_ids[i], skip_special_tokens=True)
+                        pred_text = self.tokenizer.decode(
+                            generated_ids[i], 
+                            skip_special_tokens=True,
+                            clean_up_tokenization_spaces=True
+                        )
                         all_predictions.append(pred_text.strip())
                         
                         target_ids = labels[i][labels[i] != -100]
-                        target_text = self.tokenizer.decode(target_ids, skip_special_tokens=True)
+                        target_text = self.tokenizer.decode(
+                            target_ids, 
+                            skip_special_tokens=True,
+                            clean_up_tokenization_spaces=True
+                        )
                         all_targets.append(target_text.strip())
                         
                 except Exception as e:
@@ -383,17 +201,13 @@ class EEGTrainer:
                     continue
         
         # Calculate metrics
-        metrics = self._compute_metrics(
-            all_predictions, 
-            all_targets, 
-            total_val_loss, 
-            total_samples,
-            loss_components_sum,
-            component_counts
-        )
+        metrics = {
+            'val_loss': total_val_loss / total_samples if total_samples > 0 else float('inf')
+        }
         
-        # Update diversity tracking
-        self._update_diversity_tracking(metrics)
+        # Text generation metrics
+        eval_metrics = self.evaluator.compute_all_metrics(all_predictions, all_targets)
+        metrics.update(eval_metrics)
         
         return metrics
 

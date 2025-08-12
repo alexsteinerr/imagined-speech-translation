@@ -1,0 +1,6 @@
+{"time":"2025-08-12T03:18:26.2468037+02:00","level":"INFO","msg":"stream: starting","core version":"0.21.0"}
+{"time":"2025-08-12T03:18:26.7306747+02:00","level":"INFO","msg":"stream: created new stream","id":"cfpekdsz"}
+{"time":"2025-08-12T03:18:26.731213+02:00","level":"INFO","msg":"stream: started","id":"cfpekdsz"}
+{"time":"2025-08-12T03:18:26.731213+02:00","level":"INFO","msg":"handler: started","stream_id":"cfpekdsz"}
+{"time":"2025-08-12T03:18:26.731213+02:00","level":"INFO","msg":"sender: started","stream_id":"cfpekdsz"}
+{"time":"2025-08-12T03:18:26.731213+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"cfpekdsz"}
